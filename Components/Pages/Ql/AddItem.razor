@@ -1,0 +1,130 @@
+﻿@page "/ItemM/Add"
+@using BanSach.Components.Model
+@using BanSach.Components.Services
+@using BanSach.Components.IService
+@using Microsoft.AspNetCore.Http
+@using System.IO
+@inject IWebHostEnvironment Environment
+@inject IItemManagement ItemManagement
+@rendermode InteractiveServer
+
+<h3 style="text-align: center; padding:10px; margin:10px">Thêm sản phẩm</h3>
+
+<MudGrid>
+    <MudItem xs="12" sm="10">
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Tên" @bind-Value="product.ProductName" />
+                <MudTextField Label="Mô tả" @bind-Value="product.Description" />
+                <MudTextField Label="Giá gốc" @bind-Value="product.CostPrice" />
+                <MudTextField Label="Giá bán" @bind-Value="product.SellPrice" />                
+                <MudTextField Label="Số lượng" @bind-Value="product.Quatity" />
+                <MudTextField Label="Danh mục" @bind-Value="category.CategoryName" />
+                <MudTextField Label="Giảm giá" @bind-Value="product.Img" />
+                <MudGrid>
+                    <MudItem xs="12" sm="10">
+                       @*  <MudCard>
+                            <MudCardContent>
+                                <MudTextField Label="Tiêu đề ảnh" @bind-Value="imageTitle" />
+                                <MudFileUpload T="IBrowserFile" Accept=".jpg, .png" FilesChanged="@(files => UploadFiles(files))">
+                                    <ActivatorContent>
+                                        <MudButton StartIcon="@Icons.Material.Rounded.FileUpload" Variant="Variant.Filled" Color="Color.Primary">Chọn ảnh</MudButton>
+                                    </ActivatorContent>
+                                </MudFileUpload>
+
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitImage">Thêm ảnh</MudButton>
+                            </MudCardContent>
+                        </MudCard> *@
+                    </MudItem>
+                    <MudItem xs="12" sm="10">
+                        <MudPaper Class="pa-4 mud-height-full">
+                            <MudText Typo="Typo.subtitle2">Hình ảnh đã tải lên</MudText>
+                            @if (uploadedImages.Count > 0)
+                            {
+                                foreach (var img in uploadedImages)
+                                {
+                                    <MudImage Src="@img" Fluid="true" ObjectFit="ObjectFit.Cover" Alt="Hình ảnh đã tải lên" Class="rounded-lg" />
+                                }
+                            }
+                            else
+                            {
+                                <MudText>No images uploaded yet.</MudText>
+                            }
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="add">Thêm</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="10">
+        <MudPaper Class="pa-4 mud-height-full">
+           
+            @if (success)
+            {
+                <MudText Color="Color.Success">Success</MudText>
+            }
+            else
+            {
+                <MudText Color="@Color.Error">
+                  
+                </MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private Product product = new Product(); // Khởi tạo product
+    private Category category = new Category();
+    private List<Category> Categories = new List<Category>();
+    bool success;
+
+    private string? imageTitle;
+    private List<string> uploadedImages = new List<string>();
+    private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
+    private void UploadFiles(IReadOnlyList<IBrowserFile> files)
+    {
+        selectedFiles = files.ToList();
+    }
+
+
+    private async Task SubmitImage()
+    {
+        foreach (var file in selectedFiles)
+        {
+            var filePath = Path.Combine(Environment.WebRootPath, "images", file.Name);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.OpenReadStream().CopyToAsync(stream);
+            }
+
+            uploadedImages.Add($"/images/{file.Name}");
+        }
+
+        // Reset selected files after upload
+        selectedFiles.Clear();
+    }
+   
+    private async Task add()
+    {
+        if (product == null)
+        {
+            // Xử lý trường hợp product là null
+            throw new ArgumentNullException(nameof(product), "product cannot be null.");
+        }
+
+        try
+        {
+            await ItemManagement.CreateItem(product);
+            success = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            success = false;
+        }
+    }
+}
