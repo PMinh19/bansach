@@ -1,0 +1,194 @@
+﻿@page "/Ql/Detail/{productId:int}" 
+@using BanSach.Components.Model
+@using BanSach.Components.Services
+@using BanSach.Components.IService
+@using Microsoft.AspNetCore.Http
+@using System.IO
+@inject NavigationManager navigationManager
+@inject IWebHostEnvironment Environment
+@inject IItemManagement ItemManagement
+@inject HttpClient httpClient
+@rendermode InteractiveServer
+@inject IDialogService DialogService
+
+<h3 style="text-align: center; padding:10px; margin:10px">Thông tin sản phẩm</h3>
+<MudButton OnClick="Delete">Xóa</MudButton> 
+
+<MudGrid>
+    <MudItem xs="12" sm="10">
+        <MudCard>
+            <MudCardContent>
+                @if (product != null)
+                {
+                    <MudTextField Label="Tên" @bind-Value="product.ProductName" />
+                    <MudTextField Label="Mô tả" @bind-Value="product.Description" />
+                    <MudTextField Label="Giá gốc" @bind-Value="product.CostPrice" />
+                    <MudTextField Label="Giá bán" @bind-Value="product.SellPrice" />
+                    <MudTextField Label="Số lượng" @bind-Value="product.Quatity" />
+
+                    <MudItem Class="pt-1" xs="4" md="4">
+                        <MudSelect Label="Danh mục" Dense="true" Variant="Variant.Outlined" Margin="Margin.Dense" T="string" @bind-Value="@category.CategoryName">
+                            @foreach (var cat in Categories)
+                            {
+                                <MudSelectItem Value="@cat.CategoryName">
+                                    <MudText Class="mb-1">@cat.CategoryName</MudText>
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudTextField Label="Giảm giá" @bind-Value="product.Img" />
+                }
+                else
+                {
+                    <MudText Color="Color.Error">Sản phẩm không tồn tại.</MudText>
+                }
+
+                <MudGrid>
+                    <MudItem xs="12" sm="10">
+                        <MudPaper Class="pa-4 mud-height-full">
+                            <MudText Typo="Typo.subtitle2">Hình ảnh đã tải lên</MudText>
+                            @if (uploadedImages.Count > 0)
+                            {
+                                foreach (var img in uploadedImages)
+                                {
+                                    <MudImage Src="@img" Fluid="true" ObjectFit="ObjectFit.Cover" Alt="Hình ảnh đã tải lên" Class="rounded-lg" />
+                                }
+                            }
+                            else
+                            {
+                                <MudText>No images uploaded yet.</MudText>
+                            }
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="edit">Sửa</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="10">
+        <MudPaper Class="pa-4 mud-height-full">
+            @if (success)
+            {
+                <MudText Color="Color.Success">Cập nhật thành công!</MudText>
+            }
+            else if (success == false)
+            {
+                <MudText Color="Color.Error">Đã xảy ra lỗi trong quá trình cập nhật.</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+@if (!string.IsNullOrEmpty(successMessage) || !string.IsNullOrEmpty(errorMessage))
+{
+    <MudContainer Class="mt-3">
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <MudAlert Severity="Severity.Success">@successMessage</MudAlert>
+        }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <MudAlert Severity="Severity.Warning">@errorMessage</MudAlert>
+        }
+    </MudContainer>
+}
+@code {
+    private Product? product; // Khởi tạo product
+    private Category category = new Category();
+    private List<Category> Categories = new List<Category>();
+    bool success;
+    string errorMessage = "";
+    string successMessage = "";
+    [Parameter]
+    public int productId { get; set; }
+    private List<string> uploadedImages = new List<string>();
+    private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
+
+    private async Task<Product> GetProduct()
+    {
+        try
+        {
+            var fetchedProduct = await ItemManagement.GetItemById(productId);
+            return fetchedProduct ?? throw new Exception("Sản phẩm không tồn tại.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Lỗi khi lấy sản phẩm: {ex.Message}");
+            return null;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await GetProduct();
+        try
+        {
+            Categories = await ItemManagement.GetAllCategogy();
+            System.Diagnostics.Debug.WriteLine("Số lượng danh mục: " + Categories.Count);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("Lỗi trong OnInitializedAsync: " + ex.Message);
+        }
+    }
+
+    private async Task SubmitImage()
+    {
+        foreach (var file in selectedFiles)
+        {
+            var filePath = Path.Combine(Environment.WebRootPath, "images", file.Name);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.OpenReadStream().CopyToAsync(stream);
+            }
+
+            uploadedImages.Add($"/images/{file.Name}");
+        }
+
+        selectedFiles.Clear(); // Reset selected files after upload
+    }
+
+    private async Task edit()
+    {
+        if (product == null) throw new ArgumentNullException(nameof(product), "product cannot be null.");
+
+        try
+        {
+            product.Updated = DateTime.Now;
+            await ItemManagement.EditItem(product);
+            success = true;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Lỗi khi sửa sản phẩm: " + ex.Message;
+            success = false;
+        }
+
+
+    }
+    private async Task Delete()
+    {
+        if (product == null)
+        {
+            throw new ArgumentNullException(nameof(product), "Sản phẩm không tồn tại.");
+        }
+
+        try
+        {
+            // Xác nhận trước khi xóa
+           
+                await ItemManagement.DeleteItem(product);
+                // Thực hiện các hành động khác sau khi xóa (như chuyển hướng hoặc cập nhật giao diện)
+           
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Lỗi khi xóa sản phẩm: " + ex.Message;
+        }
+    }
+
+   
+}

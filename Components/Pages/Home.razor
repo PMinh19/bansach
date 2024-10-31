@@ -8,7 +8,11 @@
 @inject IDialogService DialogService
 @inject NavigationManager navigationManager
 @inject IItemManagement ItemManagement
+@inject HttpClient httpClient
+@rendermode InteractiveServer
+@inject IDialogService DialogService
 <PageTitle>Home</PageTitle>
+<MudButton OnClick="AddProduct">Thêm</MudButton>
 <MudTable Items="@products" Filter="new Func<Product,bool>(FilterFunc1)" Dense="true" Breakpoint="Breakpoint.None" Virtualize="true"
           Style="white-space:nowrap" Bordered="true" RowClass="cursor-pointer" Striped="true" Hover="true" HorizontalScrollbar="true">
     <ToolBarContent>
@@ -17,19 +21,19 @@
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>STT</MudTh>
+        <MudTh>ID</MudTh>
         <MudTh>Tên</MudTh>
         <MudTh>Giá bán</MudTh>
         <MudTh>Số lượng</MudTh>
         <MudTh>Ảnh bìa</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="STT"></MudTd>
-        <MudTd DataLabel="Tên">@context.ProductName</MudTd>
+        <MudTd DataLabel="ID" > <div @onclick="@(()=>DetailProduct(context.ProductId))">@context.ProductId</div></MudTd>
+        <MudTd DataLabel="Tên"><div @onclick="@(()=>DetailProduct(context.ProductId))">@context.ProductName</div></MudTd>
         <MudTd DataLabel="Giá bán">
-            @string.Format(new CultureInfo("vi-VN"), "{0:N0}", context.SellPrice)
+            <div @onclick="@(()=>DetailProduct(context.ProductId))">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", context.SellPrice)</div>
         </MudTd>
-        <MudTd DataLabel="Số lượng">@context.Quatity</MudTd>
+        <MudTd DataLabel="Số lượng"><div @onclick="@(()=>DetailProduct(context.ProductId))">@context.Quatity</div></MudTd>
         <MudTd DataLabel="Ảnh bìa">
             <MudAvatar Image="context.Img" Size="Size.Medium" />
         </MudTd>
@@ -40,6 +44,8 @@
     </PagerContent>
 </MudTable>
 @code{
+    private Category category = new Category();
+    private List<Category> categories = new List<Category>();
     public List<Product> products = new List<Product>();
     public Product product = new Product();
     private string resultMessage = string.Empty;
@@ -53,24 +59,43 @@
     {
         pageIndex = index;
     }
+    private async Task<List<Product>> getAllSach() => await ItemManagement.GetAllItem();
+
     protected override async Task OnInitializedAsync()
     {
-        products = await ItemManagement.GetAllItem();
+        products = await getAllSach();
         System.Diagnostics.Debug.WriteLine("Số lượng sản phẩm: " + products.Count); // Kiểm tra xem có bao nhiêu sản phẩm được trả về
         System.Diagnostics.Debug.WriteLine("1");
+        categories = await ItemManagement.GetAllCategogy();
+         System.Diagnostics.Debug.WriteLine("Số lượng danh mục: " + categories.Count); // Kiểm tra xem có bao nhiêu sản phẩm được trả về
+    //     System.Diagnostics.Debug.WriteLine("1");
     }
     // tìm kiếm
     private bool FilterFunc1(Product Product) => FilterFunc(Product, searchString1);
 
-    private bool FilterFunc(Product Product, string searchString)
+    private bool FilterFunc(Product? product, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (Product.ProductName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+
+        if (product == null)
+            return false; 
+
+        if (product.ProductName != null &&
+            product.ProductName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{Product.CostPrice} {Product.SellPrice} {Product.CategoryId} ".Contains(searchString))
-            return true;
-        return false;
+
+        string combinedValues = $"{product.CostPrice} {product.SellPrice} {product.CategoryId} ";
+        return combinedValues.Contains(searchString, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void AddProduct()
+    {
+        navigationManager.NavigateTo("/Ql/add");
+    }
+    private void DetailProduct( int productId)
+    {
+        navigationManager.NavigateTo($"/Ql/Detail/{productId}");
     }
 }
 
