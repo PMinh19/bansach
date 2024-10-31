@@ -5,6 +5,7 @@ using BanSach.Components.Data;
 using Microsoft.Extensions.DependencyInjection;
 using BanSach.Components.Services;
 using BanSach.Components.IService;
+using Microsoft.Extensions.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,8 @@ builder.Services.AddMudServices();
 builder.Services.AddScoped <IItemManagement, ItemManagement>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

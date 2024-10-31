@@ -1,0 +1,16 @@
+﻿@page "/LoginwithFacebook"
+@inject NavigationManager NavigationManager
+
+<h3>Đăng nhập với Facebook</h3>
+
+<div class="login-container">
+    <button class="btn btn-primary" @onclick="NavigatetoLoginwithFacebook">Đăng nhập với Facebook</button>
+</div>
+
+@code {
+    private void NavigatetoLoginwithFacebook()
+    {
+        // Chuyển hướng đến trang đăng nhập Facebook
+        NavigationManager.NavigateTo("https://www.facebook.com/login", forceLoad: true);
+    }
+}

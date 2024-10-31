@@ -1,4 +1,4 @@
-h1:focus {
+﻿h1:focus {
     outline: none;
 }
 
@@ -21,9 +21,260 @@ h1:focus {
 }
 
     .blazor-error-boundary::after {
-        content: "An error has occurred."
+        content: "An error has occurred.";
     }
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+<Router AppAssembly="@typeof(Program).Assembly" >
+<Found Context="routeData" >
+<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" / >
+<FocusOnNavigate RouteData="@routeData" Selector="h1" / >
+</Found >
+<NotFound >
+<LayoutView Layout="@typeof(MainLayout)" >
+<p > Sorry, there's nothing at this address.</p>
+</LayoutView >
+</NotFound >
+</Router >
+
+.login-body {
+    background: url('images/bg.webp');
+    background-size: cover;
+    background-position-y: -80px;
+    font-size: 16px;
+}
+
+#wrapper {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: flex-start; /* Căn trái */
+    align-items: center;
+    overflow: hidden;
+}
+
+.BackgroundLogin-image {
+    image-rendering: crisp-edges;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(images/bg.webp);
+    background-size: cover; /* Đảm bảo hình ảnh phủ kín khu vực */
+    background-position: center; /* Đặt hình ảnh ở giữa */
+    z-index: -1; /* Để nằm dưới các thành phần khác */
+    filter: blur(5px); /* Thêm hiệu ứng làm mờ (tùy chọn) */
+}
+
+.form-container {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%; /* Chiếm 50% chiều rộng của hình nền */
+    max-width: 400px; /* Đặt chiều rộng tối đa */
+    margin-left: 0;
+    margin-top: 100px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#form-login {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 30px 30px 40px;
+    box-shadow: 0px 0px 17px 2px rgba(255, 255, 255, 0.8);
+    width: 100%; /* Đặt chiều rộng 100% của container */
+    margin: 0; /* Đặt margin là 0 để căn chính xác */
+}
+
+.form-heading {
+    font-size: 25px;
+    color: #f5f5f5;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    border-bottom: 1px solid #fff;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+    .form-group i {
+        color: #fff;
+        font-size: 14px;
+        padding-top: 5px;
+        padding-right: 10px;
+    }
+
+.form-input {
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: #f5f5f5;
+    flex-grow: 1;
+}
+
+    .form-input::placeholder {
+        color: #f5f5f5;
+    }
+
+#eye i {
+    padding-right: 0;
+    cursor: pointer;
+}
+
+.form-submit {
+    background: transparent;
+    background-color: steelblue;
+    border: 1px solid #f5f5f5;
+    color: #fff;
+    width: 100%;
+    padding: 6px 10px;
+    transition: 0.25s ease-in-out;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+    .form-submit:hover {
+        border: 1px solid #54a0ff;
+    }
+
+.form-forgot {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 12px;
+    color: cornflowerblue;
+    margin-bottom: 2px;
+    margin-left: 1px;
+}
+
+.form-facebook {
+    display: inline-block;
+    border: 1px solid #f5f5f5;
+    color: #fff;
+    width: 100%;
+    padding: 6px 10px;
+    transition: 0.25s ease-in-out;
+    margin-top: 20px;
+    margin-bottom: 5px; /* Sửa để không có khoảng cách thêm */
+    background-color: #3b5998;
+    text-align: center;
+    border-radius: 5px;
+    background-image: url(../images/icons8-facebook.svg);
+    background-repeat: no-repeat;
+    background-size: 30px;
+    background-position: 2px;
+}
+
+    .form-facebook:hover {
+        border: 1px solid #54a0ff; /* Hiệu ứng hover */
+    }
+
+.form-link {
+    color: dimgrey;
+    margin-top: 10px; /* Khoảng cách từ phần trên */
+    margin-bottom: 20px; /* Khoảng cách giữa form và các thành phần bên dưới */
+}
+
+    .form-link span {
+        margin-left: 5px; /* Thêm khoảng cách bên trái cho liên kết đăng ký */
+    }
+
+/* FORGOT PASSWORD */
+.forgot-body {
+    background: url('images/bgforgot.jpg');
+    background-size: cover;
+    background-position: center; /* Đặt hình nền ở giữa */
+    min-height: 100vh; /* Đảm bảo phần tử chứa có chiều cao tối thiểu bằng chiều cao của viewport */
+    position: relative; /* Để cho các phần tử con có thể định vị đúng cách */
+    display: flex; /* Sử dụng flexbox để căn giữa */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.BackgroundForgot-image {
+    position: absolute; /* Để nằm dưới các thành phần khác */
+    top: 0; /* Đặt vị trí từ trên cùng */
+    left: 0; /* Đặt vị trí từ bên trái */
+    width: 100%;
+    height: 100%;
+    background-image: url(images/bgforgot.jpg);
+    background-size: cover; /* Đảm bảo hình ảnh phủ kín khu vực */
+    background-position: center; /* Đặt hình ảnh ở giữa */
+    z-index: -1; /* Để nằm dưới các thành phần khác */
+    filter: blur(5px); /* Thêm hiệu ứng làm mờ (tùy chọn) */
+}
+.forgot-image {
+    max-width: 80px; /* Đặt chiều rộng tối đa cho hình ảnh */
+    margin-bottom: 15px; /* Tạo khoảng cách dưới hình ảnh */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.forgot-password-container {
+    max-width: 400px;
+    padding: 20px;
+    position: relative;
+    z-index: 2;
+    background: rgba(255,255,255,0.6);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+
+
+.form-forgotheading {
+    font-size: 25px;
+    color: #333; /* Cập nhật màu chữ */
+    text-align: center; /* Căn giữa tiêu đề */
+    margin-bottom: 30px; /* Khoảng cách dưới tiêu đề */
+}
+
+.form-fotgottext {
+    font-size: 15px;
+    color: black; /* Cập nhật màu chữ */
+    margin-top: 10px; /* Khoảng cách phía trên */
+    margin-bottom: 20px; /* Khoảng cách phía dưới */
+}
+.form-inputforgot {
+    width: 400px;
+    height: 40px;
+    background: transparent;
+    border: 2px solid black; /* Thêm viền đen */
+    outline: none; /* Bỏ viền focus */
+    color: #f5f5f5;
+    flex-grow: 1;
+    position: relative; /* Đảm bảo có vị trí để tương tác */
+    z-index: 10; /* Đặt trên các phần tử khác nếu cần */
+}
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Để trung tâm trang */
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #3b5998; /* Màu của Facebook */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+    .btn:hover {
+        background-color: #2a447a; /* Màu tối hơn khi hover */
+    }

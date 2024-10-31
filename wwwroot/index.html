@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="reset.css" rel="stylesheet" />
+    <link href="Loginapp.css" rel="stylesheet" />
+
+</head>
+<body>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: 'YOUR_APP_ID', // Thay thế với App ID của bạn
+                cookie: true,
+                xfbml: true,
+                version: 'v13.0' // Thay thế với phiên bản SDK bạn muốn sử dụng
+            });
+        };
+
+        // Đăng nhập với Facebook
+        window.loginWithFacebook = function () {
+            FB.login(function (response) {
+                if (response.authResponse) {
+                    console.log('User is logged in with Facebook', response);
+                } else {
+                    console.log('User cancelled login or did not fully authorize.');
+                }
+            }, { scope: 'email' });
+        };
+    </script>
+</body>
+</html>
