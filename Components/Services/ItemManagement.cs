@@ -36,13 +36,21 @@ namespace BanSach.Components.Services
             db.Products.Update(Product);
             await db.SaveChangesAsync();
         }
-        public async Task<Product> GetItemById(int ProductId)
+        public async Task<Product?> GetItemById(int productId)
         {
-            return await db.Products.FirstOrDefaultAsync(p => p.ProductId == ProductId);
+            var product = await db.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+            if (product == null)
+            {
+                return null; 
+            }
+
+            return product;
         }
+
         public async Task<List<Category>> GetAllCategogy()
         {
             return await db.Categories.ToListAsync();
         }
+       
     }
 }

@@ -1,13 +1,15 @@
-﻿@page "/ItemM/Add"
+﻿@page "/Ql/add"
 @using BanSach.Components.Model
 @using BanSach.Components.Services
 @using BanSach.Components.IService
 @using Microsoft.AspNetCore.Http
 @using System.IO
 @inject IWebHostEnvironment Environment
+@inject NavigationManager navigationManager
 @inject IItemManagement ItemManagement
+@inject HttpClient httpClient
 @rendermode InteractiveServer
-
+@inject IDialogService DialogService
 <h3 style="text-align: center; padding:10px; margin:10px">Thêm sản phẩm</h3>
 
 <MudGrid>
@@ -19,7 +21,18 @@
                 <MudTextField Label="Giá gốc" @bind-Value="product.CostPrice" />
                 <MudTextField Label="Giá bán" @bind-Value="product.SellPrice" />                
                 <MudTextField Label="Số lượng" @bind-Value="product.Quatity" />
-                <MudTextField Label="Danh mục" @bind-Value="category.CategoryName" />
+                <MudItem Class="pt-1" xs="4" md="4">
+                    <MudSelect ShrinkLabel Label="Danh mục" Dense="true" Variant="Variant.Outlined" Margin="Margin.Dense" T="int" @bind-Value="product.CategoryId">
+                        @foreach (var category in Categories)
+                        {
+                            <MudSelectItem Value="@category.CategoryId">
+                                <MudText Class="mb-1">@category.CategoryName</MudText>
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+               
                 <MudTextField Label="Giảm giá" @bind-Value="product.Img" />
                 <MudGrid>
                     <MudItem xs="12" sm="10">
@@ -55,7 +68,7 @@
                 </MudGrid>
             </MudCardContent>
             <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="add">Thêm</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="Add">Thêm</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
@@ -77,12 +90,14 @@
 </MudGrid>
 
 @code {
-    private Product product = new Product(); // Khởi tạo product
+    private Product product = new Product();
+    private List<Product> products = new List<Product>();
     private Category category = new Category();
     private List<Category> Categories = new List<Category>();
     bool success;
-
-    private string? imageTitle;
+    string errorMessage = "";
+    string successMessage = "";
+    // private string? imageTitle;
     private List<string> uploadedImages = new List<string>();
     private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
     private void UploadFiles(IReadOnlyList<IBrowserFile> files)
@@ -90,6 +105,18 @@
         selectedFiles = files.ToList();
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Categories = await ItemManagement.GetAllCategogy();
+            System.Diagnostics.Debug.WriteLine("2222Số lượng danh mục: " + Categories.Count);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("Lỗi trong OnInitializedAsync: " + ex.Message);
+        }
+    }
 
     private async Task SubmitImage()
     {
@@ -107,24 +134,70 @@
         // Reset selected files after upload
         selectedFiles.Clear();
     }
-   
-    private async Task add()
+
+    private async Task Add()
     {
+        DateTime thoiGian = DateTime.Now;
         if (product == null)
         {
-            // Xử lý trường hợp product là null
             throw new ArgumentNullException(nameof(product), "product cannot be null.");
         }
 
+        // Kiểm tra điều kiện trước khi thêm sản phẩm
+        if (products.Any(p => p.ProductName.Equals(product.ProductName, StringComparison.OrdinalIgnoreCase)))
+        {
+            errorMessage = "Tên sản phẩm đã tồn tại.";
+            success = false;
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(product.ProductName))
+        {
+            errorMessage = "Tên sản phẩm không được để trống.";
+            success = false;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(product.Description))
+        {
+            errorMessage = "Mô tả không được để trống.";
+            success = false;
+            return;
+        }
+
+        if (product.CostPrice <= 0)
+        {
+            errorMessage = "Giá gốc phải lớn hơn 0.";
+            success = false;
+            return;
+        }
+
+        if (product.SellPrice <= 0)
+        {
+            errorMessage = "Giá bán phải lớn hơn 0.";
+            success = false;
+            return;
+        }
+
+        if (product.Quatity < 0)
+        {
+            errorMessage = "Số lượng không được âm.";
+            success = false;
+            return;
+        }
+        
         try
         {
+            product.Created = thoiGian;
             await ItemManagement.CreateItem(product);
             success = true;
+            navigationManager.NavigateTo("/");
+            errorMessage = null; // Xóa thông báo lỗi nếu thành công
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            errorMessage = "Lỗi khi thêm sản phẩm: " + ex.Message;
             success = false;
         }
     }
+
 }

@@ -9,5 +9,6 @@ namespace BanSach.Components.IService
         Task DeleteItem(Product Product);
         Task EditItem(Product Product);
         Task<Product?> GetItemById(int ProductId);
+        Task<List<Category>> GetAllCategogy();
     }
 }

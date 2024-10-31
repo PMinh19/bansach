@@ -1,18 +1,21 @@
 ﻿@inherits LayoutComponentBase
 
 <MudThemeProvider @rendermode="InteractiveServer" />
+<MudPopoverProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 <MudSnackbarProvider @rendermode="InteractiveServer" />
-<MudPopoverProvider />
-<MudSnackbarProvider />
-<MudLayout>
-    <MudAppBar Color="Color.Primary" Fixed="false">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" />
-    </MudAppBar>
-     <MudDrawer Open="true">
+<MudAppBar Color="Color.Primary" Fixed="false" Class="menu">
+   
+    
+    <MudSpacer></MudSpacer>
+    <MudIconButton Icon="@Icons.Custom.Brands.GitHub" style="color:white" ></MudIconButton>
+</MudAppBar>
 
-    </MudDrawer> 
+<MudLayout>
+   
+    <MudDrawer Open="true">
+
+    </MudDrawer>
     <MudMainContent>
         @Body
     </MudMainContent>
@@ -22,3 +25,5 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+<link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
