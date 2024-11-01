@@ -41,7 +41,7 @@
 </Router >
 
 .login-body {
-    background: url('images/bg.webp');
+    background: url('images/bg.jpg');
     background-size: cover;
     background-position-y: -80px;
     font-size: 16px;
@@ -51,7 +51,7 @@
     position: relative;
     min-height: 100vh;
     display: flex;
-    justify-content: flex-start; /* Căn trái */
+    justify-content: flex-start;
     align-items: center;
     overflow: hidden;
 }
@@ -64,11 +64,11 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url(images/bg.webp);
+    background-image: url('images/bg.jpg');
     background-size: cover; /* Đảm bảo hình ảnh phủ kín khu vực */
     background-position: center; /* Đặt hình ảnh ở giữa */
     z-index: -1; /* Để nằm dưới các thành phần khác */
-    filter: blur(5px); /* Thêm hiệu ứng làm mờ (tùy chọn) */
+    /* filter: blur(5px); */ /* Xóa hoặc bình luận dòng này */
 }
 
 .form-container {
@@ -248,16 +248,17 @@
     margin-bottom: 20px; /* Khoảng cách phía dưới */
 }
 .form-inputforgot {
-    width: 400px;
-    height: 40px;
     background: transparent;
-    border: 2px solid black; /* Thêm viền đen */
-    outline: none; /* Bỏ viền focus */
-    color: #f5f5f5;
+    border: 0;
+    outline: 0;
+    color: black;
     flex-grow: 1;
-    position: relative; /* Đảm bảo có vị trí để tương tác */
-    z-index: 10; /* Đặt trên các phần tử khác nếu cần */
 }
+
+    .form-inputforgot::placeholder {
+        color: black;
+    }
+
 .login-container {
     display: flex;
     justify-content: center;
@@ -267,7 +268,7 @@
 
 .btn {
     padding: 10px 20px;
-    background-color: #3b5998; /* Màu của Facebook */
+    background-color: #3b5998; 
     color: white;
     border: none;
     border-radius: 5px;
@@ -276,5 +277,270 @@
 }
 
     .btn:hover {
-        background-color: #2a447a; /* Màu tối hơn khi hover */
+        background-color: #2a447a; 
+    }
+
+.signup-body {
+    background: url('images/bg.jpg');
+    background-size: cover;
+    background-position-y: -80px;
+    font-size: 16px;
+}
+
+#signupwrapper {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+}
+
+.BackgroundSignUp-image {
+    image-rendering: crisp-edges;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/bg.jpg');
+    background-size: cover; /* Đảm bảo hình ảnh phủ kín khu vực */
+    background-position: center; /* Đặt hình ảnh ở giữa */
+    z-index: -1; /* Để nằm dưới các thành phần khác */
+    filter: blur(5px); /* Thêm hiệu ứng làm mờ (tùy chọn) */
+}
+
+.form-signupcontainer {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%; /* Chiếm 50% chiều rộng của hình nền */
+    max-width: 400px; /* Đặt chiều rộng tối đa */
+    margin-left: 0;
+    margin-top: 100px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+
+.form-signupheading {
+    font-size: 25px;
+    color: black;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-signupgroup {
+    border-bottom: 1px solid #fff;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+    .form-signupgroup i {
+        color: #fff;
+        font-size: 14px;
+        padding-top: 5px;
+        padding-right: 10px;
+    }
+
+.form-signupinput {
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: black;
+    flex-grow: 1;
+}
+
+    .form-signupinput::placeholder {
+        color: black;
+    }
+
+
+.form-signupsubmit {
+    background: transparent;
+    background-color: steelblue;
+    border: 1px solid #f5f5f5;
+    color: #fff;
+    width: 100%;
+    padding: 6px 10px;
+    transition: 0.25s ease-in-out;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+    .form-signupsubmit:hover {
+        border: 1px solid #54a0ff;
+    }
+
+
+.form-signuplink {
+    color: dimgrey;
+    margin-top: 10px; /* Khoảng cách từ phần trên */
+    margin-bottom: 20px; /* Khoảng cách giữa form và các thành phần bên dưới */
+}
+
+    .form-signuplink span {
+        margin-left: 5px; /* Thêm khoảng cách bên trái cho liên kết đăng ký */
+    }
+
+.getotp-body {
+    background: url('images/bgforgot.jpg');
+    background-size: cover;
+    background-position: center; /* Đặt hình nền ở giữa */
+    min-height: 100vh; /* Đảm bảo phần tử chứa có chiều cao tối thiểu bằng chiều cao của viewport */
+    position: relative; /* Để cho các phần tử con có thể định vị đúng cách */
+    display: flex; /* Sử dụng flexbox để căn giữa */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.BackgroundGetOTP-image {
+    position: absolute; /* Để nằm dưới các thành phần khác */
+    top: 0; /* Đặt vị trí từ trên cùng */
+    left: 0; /* Đặt vị trí từ bên trái */
+    width: 100%;
+    height: 100%;
+    background-image: url(images/bgforgot.jpg);
+    background-size: cover; /* Đảm bảo hình ảnh phủ kín khu vực */
+    background-position: center; /* Đặt hình ảnh ở giữa */
+    z-index: -1; /* Để nằm dưới các thành phần khác */
+    filter: blur(5px); /* Thêm hiệu ứng làm mờ (tùy chọn) */
+}
+
+
+.getotp-container {
+    max-width: 400px;
+    padding: 20px;
+    position: relative;
+    z-index: 2;
+    background: rgba(255,255,255,0.6);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+
+
+.form-getotpheading {
+    font-size: 25px;
+    color: #333; /* Cập nhật màu chữ */
+    text-align: center; /* Căn giữa tiêu đề */
+    margin-bottom: 30px; /* Khoảng cách dưới tiêu đề */
+}
+
+
+.form-getotpinput {
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: black;
+    flex-grow: 1;
+}
+
+    .form-getotpinput::placeholder {
+        color: black;
+    }
+.form-getotpgroup {
+    border-bottom: 1px solid #fff;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+    .form-getotpgroup i {
+        color: #fff;
+        font-size: 14px;
+        padding-top: 5px;
+        padding-right: 10px;
+    }
+.form-getotptext {
+    font-size: 15px;
+    color: black; /* Cập nhật màu chữ */
+    margin-top: 10px; /* Khoảng cách phía trên */
+    margin-bottom: 20px; /* Khoảng cách phía dưới */
+}
+.changepassword-body {
+    background: url('images/bgforgot.jpg');
+    background-size: cover;
+    background-position: center; /* Đặt hình nền ở giữa */
+    min-height: 100vh; /* Đảm bảo phần tử chứa có chiều cao tối thiểu bằng chiều cao của viewport */
+    position: relative; /* Để cho các phần tử con có thể định vị đúng cách */
+    display: flex; /* Sử dụng flexbox để căn giữa */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.BackgroundChangePassword-image {
+    position: absolute; /* Để nằm dưới các thành phần khác */
+    top: 0; /* Đặt vị trí từ trên cùng */
+    left: 0; /* Đặt vị trí từ bên trái */
+    width: 100%;
+    height: 100%;
+    background-image: url(images/bgforgot.jpg);
+    background-size: cover; /* Đảm bảo hình ảnh phủ kín khu vực */
+    background-position: center; /* Đặt hình ảnh ở giữa */
+    z-index: -1; /* Để nằm dưới các thành phần khác */
+    filter: blur(5px); /* Thêm hiệu ứng làm mờ (tùy chọn) */
+}
+
+.form-changepassword-container {
+    position: relative; /* Để chứa form bên trên hình nền */
+    z-index: 1; /* Đặt layer cho form ở trên hình nền */
+    background: rgba(255, 255, 255, 0.8); /* Thêm nền trắng trong suốt cho form */
+    padding: 30px; /* Khoảng cách bên trong form */
+    border-radius: 8px; /* Bo tròn góc cho form */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Thêm bóng cho form */
+}
+
+.form-changepasswordheading {
+    font-size: 25px;
+    color: #333; /* Cập nhật màu chữ */
+    text-align: center; /* Căn giữa tiêu đề */
+    margin-bottom: 30px; /* Khoảng cách dưới tiêu đề */
+}
+
+.form-changepasswordinput {
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: black;
+    flex-grow: 1;
+}
+
+    .form-changepasswordinput::placeholder {
+        color: black;
+    }
+
+.form-changepasswordgroup {
+    border-bottom: 1px solid #fff;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+    .form-changepasswordgroup i {
+        color: #fff;
+        font-size: 14px;
+        padding-top: 5px;
+        padding-right: 10px;
+    }
+
+.form-changepasswordsubmit {
+    background: transparent;
+    background-color: steelblue;
+    border: 1px solid #f5f5f5;
+    color: #fff;
+    width: 100%;
+    padding: 6px 10px;
+    transition: 0.25s ease-in-out;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+    .form-changepasswordsubmit:hover {
+        border: 1px solid #54a0ff;
     }

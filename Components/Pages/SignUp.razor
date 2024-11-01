@@ -1,0 +1,62 @@
+﻿@page "/SignUp"
+@inject NavigationManager NavigationManager
+@using System.ComponentModel.DataAnnotations
+
+<div class="signup-body">
+    <div id="signupwrapper">
+        <img src="~/images/bg.jpg" alt="BackgroundSignUp" class="BackgroundSignUp-image" />
+        <div id="form-signup" class="form-signupcontainer">
+
+            <EditForm Model="signUpModel" OnValidSubmit="@ProcessSignUp" FormName="signupForm">
+                <h1 class="form-signupheading">Đăng ký</h1>
+
+                <div class="form-signupgroup">
+                    <InputText class="form-signupinput" @bind-Value="signUpModel.Username" placeholder="Username" />
+                    <ValidationMessage For="@(() => signUpModel.Username)" />
+                </div>
+
+                <div class="form-signupgroup">
+                    <InputText class="form-signupinput" @bind-Value="signUpModel.Email" placeholder="Email" />
+                    <ValidationMessage For="@(() => signUpModel.Email)" />
+                </div>
+
+                <div class="form-signupgroup">
+                    <InputText @bind-Value="signUpModel.Password" type="password" class="form-signupinput" placeholder="Password" />
+                    <ValidationMessage For="@(() => signUpModel.Password)" />
+                </div>
+
+                <button type="submit" class="form-signupsubmit">Sign Up</button> <br />
+
+                <div class="form-signuplink">
+                    <label>Already a member?</label>
+                    <NavLink class="form-forgot" href="/login" Match="NavLinkMatch.All" style="cursor:pointer">Login</NavLink><br />
+                </div>
+            </EditForm>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private SignUpModel signUpModel = new SignUpModel();
+
+    public class SignUpModel
+    {
+        [Required(ErrorMessage = "Tên người dùng là bắt buộc")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email là bắt buộc")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private void ProcessSignUp()
+    {
+        // Logic xử lý đăng ký (lưu vào database, gọi API, v.v.)
+        Console.WriteLine("Đăng ký thành công: " + signUpModel.Username);
+        NavigationManager.NavigateTo("/", forceLoad: true);
+    }
+}
