@@ -27,7 +27,7 @@
                     <MudTextField Label="Số lượng" @bind-Value="product.Quatity" />
 
                     <MudItem Class="pt-1" xs="4" md="4">
-                        <MudSelect Label="Danh mục" Dense="true" Variant="Variant.Outlined" Margin="Margin.Dense" T="string" @bind-Value="@category.CategoryName">
+                        <MudSelect Label="Danh mục" Dense="true" Variant="Variant.Outlined" Margin="Margin.Dense" T="string" @bind-Value="categoryName">
                             @foreach (var cat in Categories)
                             {
                                 <MudSelectItem Value="@cat.CategoryName">
@@ -37,7 +37,7 @@
                         </MudSelect>
                     </MudItem>
 
-                    <MudTextField Label="Giảm giá" @bind-Value="product.Img" />
+                    
                 }
                 else
                 {
@@ -68,19 +68,6 @@
             </MudCardActions>
         </MudCard>
     </MudItem>
-
-    <MudItem xs="12" sm="10">
-        <MudPaper Class="pa-4 mud-height-full">
-            @if (success)
-            {
-                <MudText Color="Color.Success">Cập nhật thành công!</MudText>
-            }
-            else if (success == false)
-            {
-                <MudText Color="Color.Error">Đã xảy ra lỗi trong quá trình cập nhật.</MudText>
-            }
-        </MudPaper>
-    </MudItem>
 </MudGrid>
 @if (!string.IsNullOrEmpty(successMessage) || !string.IsNullOrEmpty(errorMessage))
 {
@@ -96,9 +83,12 @@
     </MudContainer>
 }
 @code {
+    public int categoryId;
+    public string? categoryName;
     private Product? product; // Khởi tạo product
     private Category category = new Category();
     private List<Category> Categories = new List<Category>();
+    public List<Product> products = new List<Product>();
     bool success;
     string errorMessage = "";
     string successMessage = "";
@@ -120,10 +110,15 @@
             return null;
         }
     }
-
+    private async Task<Product> getSach() => await ItemManagement.GetItemById(productId);
+    private async Task<Category> getCategory() => await ItemManagement.GetCategoryById(categoryId);
     protected override async Task OnInitializedAsync()
     {
         product = await GetProduct();
+        categoryId = product.CategoryId;
+        category = await getCategory();
+        categoryName = category.CategoryName;
+       
         try
         {
             Categories = await ItemManagement.GetAllCategogy();

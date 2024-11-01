@@ -51,6 +51,35 @@ namespace BanSach.Components.Services
         {
             return await db.Categories.ToListAsync();
         }
-       
+        public async Task<Category?> GetCategoryById(int categoryId)
+        {
+            var category = await db.Categories.FirstOrDefaultAsync(p => p.CategoryId == categoryId);
+            if (category == null)
+            {
+                return null;
+            }
+
+            return category;
+        }
+        public async Task<Category> CreateCategory(Category category)
+        {
+            // Thêm Product vào cơ sở dữ liệu
+            db.Categories.Add(category);
+            await db.SaveChangesAsync();
+            return category; // Trả về đối tượng Product đã thêm
+        }
+
+        public async Task DeleteCategory(Category category)
+        {
+            db.Categories.Remove(category);
+            await db.SaveChangesAsync();
+        }
+
+        public async Task EditCategory(Category category)
+        {
+            db.Categories.Update(category);
+            await db.SaveChangesAsync();
+        }
+
     }
 }
