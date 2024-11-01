@@ -1,52 +1,55 @@
 ﻿@page "/login"
 @inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
+
 <div class="login-body">
-<div id="wrapper">
-    <img src="images/bg.webp" alt="BackgroundLogin" class="BackgroundLogin-image" />
-    <div id="form-login" class="form-container">
+    <div id="wrapper">
+        <img src="~/images/bg.jpg" alt="BackgroundLogin" class="BackgroundLogin-image" />
+        <div id="form-login" class="form-container">
 
-        <EditForm Model="loginModel" OnValidSubmit="@ProcessLogin" FormName="loginForm">
-            <h1 class="form-heading">Login</h1>
+            <EditForm Model="loginModel" OnValidSubmit="@ProcessLogin" FormName="loginForm">
+                <h1 class="form-heading">Login</h1>
 
-            <div class="form-group">
-                <InputText class="form-input" @bind-Value="loginModel.Username" placeholder="Username" />
-                <ValidationMessage For="@(() => loginModel.Username)" />
-            </div>
-
-            <div class="form-group">
-                <InputText @bind-Value="loginModel.Password" type="@passwordInputType" class="form-input" placeholder="Password" />
-                <div id="eye" @onclick="TogglePasswordVisibility" style="cursor:pointer">
-                    <i class="far @(isPasswordVisible ? "fa-eye-slash" : "fa-eye")"></i>
+                <div class="form-group">
+                    <InputText class="form-input" @bind-Value="loginModel.Username" placeholder="Username" />
+                    <ValidationMessage For="@(() => loginModel.Username)" />
                 </div>
-                <ValidationMessage For="@(() => loginModel.Password)" />
-            </div>
 
-            <div class="form-forgot">
-                <button class="form-forgot" @onclick="NavigatetoForgotPassword" style="cursor:pointer">Forgot Password?</button>
-            </div>
+                <div class="form-group">
+                    <InputText @bind-Value="loginModel.Password" type="@passwordInputType" class="form-input" placeholder="Password" />
+                    <div id="eye" @onclick="TogglePasswordVisibility" style="cursor:pointer">
+                        <i class="far @(isPasswordVisible ? "fa-eye-slash" : "fa-eye")"></i>
+                    </div>
+                    <ValidationMessage For="@(() => loginModel.Password)" />
+                </div>
 
-            <button type="submit" class="form-submit">Login</button> <br />
+                <div class="form-forgot">
+                    <NavLink class="form-forgot" href="/ForgotPassword" Match="NavLinkMatch.All" style="cursor:pointer">Forgot Password?</NavLink>
+                </div>
 
-            <div class="form-link">
-                <label>Don't have an account?</label>
-                <button class="form-forgot" @onclick="NavigatetoSignUp" style="cursor:pointer">Sign Up</button><br />
-            </div>
+                <button type="submit" class="form-submit">Login</button> <br />
 
-            <div>
-                <span></span><span>or</span><span></span><br />
-                <button class="form-facebook" @onclick="NavigatetoLoginwithFacebook" style="cursor: pointer;">Login with Facebook</button>
-            </div>
-        </EditForm>
+                <div class="form-link">
+                    <label>Don't have an account?</label>
+                    <NavLink class="form-forgot" href="/SignUp" Match="NavLinkMatch.All" style="cursor:pointer">Sign Up</NavLink><br />
+                </div>
 
+                <div>
+                    <span></span><span>or</span><span></span><br />
+                    <NavLink class="form-facebook" href="/LoginwithFacebook" Match="NavLinkMatch.All" style="cursor: pointer;">Login with Facebook</NavLink>
+                </div>
+            </EditForm>
+
+        </div>
     </div>
 </div>
-</div>
+
 @code {
     private LoginModel loginModel = new LoginModel();
     private bool isPasswordVisible = false;
     private string passwordInputType => isPasswordVisible ? "text" : "password";
-    public class LoginModel()
+
+    public class LoginModel
     {
         [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
         public string Username { get; set; } = string.Empty;
@@ -54,37 +57,24 @@
         [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
         public string Password { get; set; } = string.Empty;
     }
+
     private void ProcessLogin()
     {
         // Logic xử lý đăng nhập
         if (loginModel.Username == "admin" && loginModel.Password == "123")
         {
             Console.WriteLine("Đăng nhập thành công");
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/"); 
         }
         else
         {
             Console.WriteLine("Đăng nhập thất bại");
+            // Có thể thêm logic hiển thị thông báo lỗi
         }
     }
 
     private void TogglePasswordVisibility()
     {
-        isPasswordVisible = !isPasswordVisible;
-    }
-
-    private void NavigatetoForgotPassword()
-    {
-        NavigationManager.NavigateTo("/ForgotPassword", forceLoad: true);
-    }
-
-    private void NavigatetoSignUp()
-    {
-        NavigationManager.NavigateTo("/SignUp", forceLoad: true);
-    }
-
-    private void NavigatetoLoginwithFacebook()
-    {
-        NavigationManager.NavigateTo("/LoginwithFacebook", forceLoad: true);
+        isPasswordVisible = !isPasswordVisible; // Chuyển đổi trạng thái hiển thị mật khẩu
     }
 }

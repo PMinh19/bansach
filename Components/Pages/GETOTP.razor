@@ -1,34 +1,55 @@
 ﻿@page "/GETOTP"
+@inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
 
-<div class="get-otp-container">
-    <h1 class="form-heading">OTP Verification</h1>
-    <p>Enter the OTP sent to </p>
+<div class="getotp-body">
+    <div>
+        <img src="images/bgforgot.jpg" alt="BackgroundGetOTP" class="BackgroundGetOTP-image" />
+        <div class="getotp-container">
+            <h1 class="form-getotpheading">Xác thực OTP</h1>
+            <p class="form-getotptext">Nhập OTP đã gửi đến email</p>
 
-    <EditForm Model="@otpModel" OnValidSubmit="@ProcessGetOtp">
-        <DataAnnotationsValidator />
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <InputText id="email" @bind-Value="otpModel.Email" placeholder="Enter your email" />
-            <ValidationMessage For="@(() => otpModel.Email)" />
+            <EditForm Model="@otpModel" OnValidSubmit="@(() => NavigateToChangePassword())">
+                <DataAnnotationsValidator />
+                <div class="form-getotpgroup">
+                    <label for="otp">OTP:</label>
+                    <InputText class="form-getotpinput" @bind-Value="otpModel.OTP" placeholder="Nhập OTP" />
+                    <ValidationMessage For="@(() => otpModel.OTP)" />
+                </div>
+                <NavLink class="form-getotpsubmit" href="/ChangePassword" Match="NavLinkMatch.All" style="cursor:pointer">ENTER</NavLink>
+            
+            </EditForm>
+
         </div>
-        <button type="submit" class="form-submit">Get OTP</button>
-    </EditForm>
+    </div>
 </div>
 
 @code {
     private OtpModel otpModel = new OtpModel();
 
-    private void ProcessGetOtp()
+    private void NavigateToChangePassword()
     {
-        // Logic gửi OTP vào email tại đây
-        Console.WriteLine("OTP đã được gửi tới email.");
+        // Kiểm tra xem OTP có hợp lệ trước khi điều hướng
+        if (IsValidOtp(otpModel.OTP))
+        {
+            NavigationManager.NavigateTo("/change-password");
+        }
+        else
+        {
+            // Thêm logic xử lý khi OTP không hợp lệ, có thể hiển thị thông báo lỗi
+            Console.WriteLine("OTP không hợp lệ");
+        }
+    }
+
+    private bool IsValidOtp(string otp)
+    {
+        // Thay thế logic kiểm tra OTP ở đây. Hiện tại chỉ kiểm tra xem OTP không rỗng
+        return !string.IsNullOrWhiteSpace(otp);
     }
 
     public class OtpModel
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Required(ErrorMessage = "OTP là bắt buộc")]
+        public string OTP { get; set; } = string.Empty;
     }
 }
