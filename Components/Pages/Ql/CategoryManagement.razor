@@ -10,14 +10,15 @@
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 <div style="display:flex; justify-content: space-between; padding: 30px 30px 0 30px;">
-    <h2 style="font-family:Arial;font-weight: bold">Quản lý danh mục</h2>
-    <MudButton OnClick="@((e) => CreateAsync(category))" style="color:darkblue">Thêm</MudButton>
+    <h2 style="font-family:Arial;">Quản lý danh mục</h2>
+    <MudButton OnClick="@((e) => CreateAsync(category))" Variant="Variant.Text" Color="Color.Primary">Thêm</MudButton>
 </div>
 <MudTable Dense="true" Breakpoint="Breakpoint.None" Style="white-space:nowrap" Bordered="true" Striped="true"
           Items="@categories" SortMode="SortMode.Multiple" Hover="true">
     <HeaderContent>
         <MudTh>STT</MudTh>
         <MudTh>Tên danh mục</MudTh>
+        <MudTh>Ngày tạo</MudTh>
         <MudTh>Ảnh</MudTh>
         <MudTh>Sửa</MudTh>
         <MudTh>Xóa</MudTh>
@@ -26,6 +27,9 @@
         <MudTd DataLabel="STT"></MudTd>
         <MudTd DataLabel="Tên danh mục">
             <span>@context.CategoryName</span>
+        </MudTd>
+        <MudTd DataLabel="Ngày tạo">
+            <span>@context.Created_at</span>
         </MudTd>
         <MudTd DataLabel="Ảnh">
             <MudImage ObjectFit="ObjectFit.Cover" Width="70" Height="55" Src="@context.Img" Class="rounded-lg" />
@@ -57,15 +61,16 @@
     bool success;
     string errorMessage = "";
     string successMessage = "";
+
     protected override async Task OnInitializedAsync()
     {
         categories = await ItemManagement.GetAllCategogy();
-        System.Diagnostics.Debug.WriteLine("Số lượng danh mục: " + categories.Count);
+        StateHasChanged();
     }
     private async Task delete(Category category)
     {
-        await ItemManagement.DeleteCategory(category); // Gọi để xóa, không gán
-        await InvokeAsync(StateHasChanged); // Cập nhật giao diện
+        await ItemManagement.DeleteCategory(category); 
+        await InvokeAsync(StateHasChanged); 
     }
 
 
@@ -79,7 +84,7 @@
 
         if (!result!.Canceled)
         {
-            delete(category);
+            await delete(category);
         }
 
     }
@@ -109,34 +114,19 @@
     // tạo sản phẩm
     private async Task Create(Category category)
     {
-        if (category == null)
-        {
-            throw new ArgumentNullException(nameof(category), "category cannot be null.");
-        }
-
-        // Kiểm tra điều kiện trước khi thêm sản phẩm
-        if (categories.Any(p => p.CategoryName.Equals(category.CategoryName, StringComparison.OrdinalIgnoreCase)))
-        {
-            errorMessage = "Tên danh mục đã tồn tại.";
-            success = false;
-            return;
-        }
-        if (string.IsNullOrWhiteSpace(category.CategoryName))
-        {
-            errorMessage = "Tên danh mục không được để trống.";
-            success = false;
-            return;
-        }
-        DateTime thoiGian = DateTime.Now;
-        category.Created_at = thoiGian;
-        await ItemManagement.CreateCategory(category);
+       
+            category.Created_at = DateTime.Now;
+            await ItemManagement.CreateCategory(category);
+        
     }
+
     // sử lí dialog tạo sản phẩm
     private async Task CreateAsync(Category category)
     {
-        var dialog = await DialogService.ShowAsync<CreateDiaLog>("Create category");
+        var parameters = new DialogParameters<CreateDiaLog> { { x => x.category, category } };
+        var dialog = await DialogService.ShowAsync<CreateDiaLog>("Create category", parameters);
         var result = await dialog.Result;
-
+            
         if (!result!.Canceled)
         {
             await Create(category);

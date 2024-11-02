@@ -63,10 +63,9 @@ namespace BanSach.Components.Services
         }
         public async Task<Category> CreateCategory(Category category)
         {
-            // Thêm Product vào cơ sở dữ liệu
             db.Categories.Add(category);
             await db.SaveChangesAsync();
-            return category; // Trả về đối tượng Product đã thêm
+            return category; 
         }
 
         public async Task DeleteCategory(Category category)

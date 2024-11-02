@@ -11,16 +11,14 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Label="Id"
-                      @bind-Value="category.CategoryId" For="@(() => category.CategoryId)" ReadOnly />
         <MudTextField Label="Tên"
-                      @bind-Value="category.CategoryName" For="@(() => category.CategoryName)" />
+                      @bind-Value="category.CategoryName"/> 
         <MudTextField Label="Ảnh" Class="mt-3"
-                      @bind-Value="category.Img" For="@(() => category.Img)" />
+                      @bind-Value="category.Img"/>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" OnClick="createCategory">Update</MudButton>
+        <MudButton Color="Color.Error" OnClick="createCategory">Create</MudButton>
     </DialogActions>
 </MudDialog>
 @code {

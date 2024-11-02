@@ -11,30 +11,41 @@
 @inject HttpClient httpClient
 @rendermode InteractiveServer
 @inject IDialogService DialogService
-<MudButton OnClick="AddProduct">Thêm</MudButton>
+<div style="display:flex; justify-content: space-between; padding: 30px 30px 0 30px;">
+    <h2 style="font-family:Arial;">Quản lý sách</h2>
+    </div>
 <MudTable Items="@products" Filter="new Func<Product,bool>(FilterFunc1)" Dense="true" Breakpoint="Breakpoint.None" Virtualize="true"
           Style="white-space:nowrap" Bordered="true" RowClass="cursor-pointer" Striped="true" Hover="true" HorizontalScrollbar="true">
     <ToolBarContent>
+        <MudButton OnClick="AddProduct" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Thêm</MudButton>
         <MudSpacer />
         <MudTextField @bind-Value="searchString1" Placeholder="Tìm kiếm" Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>ID</MudTh>
+        <MudTh>STT</MudTh>
         <MudTh>Tên</MudTh>
         <MudTh>Giá bán</MudTh>
+        <MudTh>Tác giả</MudTh>
+        <MudTh>Nhà xuất bản</MudTh>
         <MudTh>Số lượng</MudTh>
         <MudTh>Ảnh bìa</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="ID" > <div @onclick="@(()=>DetailProduct(context.ProductId))">@context.ProductId</div></MudTd>
+        <MudTd DataLabel="STT">
+            <div @onclick="@(()=>DetailProduct(context.ProductId))">
+               @context.ProductId
+            </div>
+        </MudTd>
         <MudTd DataLabel="Tên"><div @onclick="@(()=>DetailProduct(context.ProductId))">@context.ProductName</div></MudTd>
         <MudTd DataLabel="Giá bán">
             <div @onclick="@(()=>DetailProduct(context.ProductId))">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", context.SellPrice)</div>
         </MudTd>
+        <MudTd DataLabel="Tác giả"><div @onclick="@(()=>DetailProduct(context.ProductId))">@context.Author</div></MudTd>
+        <MudTd DataLabel="Nhà xuất bản"><div @onclick="@(()=>DetailProduct(context.ProductId))">@context.Publisher</div></MudTd>
         <MudTd DataLabel="Số lượng"><div @onclick="@(()=>DetailProduct(context.ProductId))">@context.Quatity</div></MudTd>
         <MudTd DataLabel="Ảnh bìa">
-            <MudAvatar Image="context.Img" Size="Size.Medium" />
+            <MudImage ObjectFit="ObjectFit.Cover" Width="50" Height="30" Src="@context.Img" Class="rounded-lg" />
         </MudTd>
 
     </RowTemplate>
