@@ -1,34 +1,28 @@
 ﻿@inherits LayoutComponentBase
-<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" @rendermode="InteractiveServer" />
+<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"  @rendermode="InteractiveServer" />
 <MudPopoverProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 <MudLayout>
     <!-- Thanh AppBar của MainLayout -->
     <MudAppBar Elevation="1">
-        <!-- Hiển thị biểu tượng Menu trên các màn hình nhỏ -->
-        <MudHidden Breakpoint="Breakpoint.MdAndUp">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
-        </MudHidden>
-
-        <!-- Tiêu đề ứng dụng -->
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">
             <a href="/" style="text-decoration: none; color: inherit;">WebBookApp</a>
         </MudText>
-
-
         <MudSpacer />
-
         <!-- Bắt đầu phần AppBar từ Home.razor -->
         <MudTextField T="string" Icon="@Icons.Material.Filled.Search" Placeholder="Tìm kiếm..."
-                      Style="background-color: #4A4A4A; color: #EAEAEA; width: 200px; margin: 0 10px;" />
-        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Style="color: #EAEAEA;" />
-        <MudIconButton Href="/login" Icon="@Icons.Material.Filled.AccountCircle" Style="color: #EAEAEA;" />
+                      Style=" margin: 0 10px;" />
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Href="/cart" />
+        <MudIconButton Href="/login" Icon="@Icons.Material.Filled.AccountCircle" />
         <!-- Nút chuyển đổi chế độ sáng/tối -->
         <MudIconButton Icon="@DarkLightModeButtonIcon" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
     </MudAppBar>
 
-    <MudDrawer Open="true">
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
@@ -51,7 +45,7 @@
     {
         base.OnInitialized();
 
-        _theme = new MudTheme()
+        _theme = new()
             {
                 PaletteLight = _lightPalette,
                 PaletteDark = _darkPalette,
@@ -59,9 +53,9 @@
             };
     }
 
+
     private void DrawerToggle()
     {
-
         _drawerOpen = !_drawerOpen;
     }
 
@@ -109,7 +103,9 @@
             OverlayLight = "#1e1e2d80",
         };
 
-    public string DarkLightModeButtonIcon => _isDarkMode
-        ? Icons.Material.Filled.LightMode
-        : Icons.Material.Outlined.DarkMode;
+    public string DarkLightModeButtonIcon => _isDarkMode switch
+    {
+        true => Icons.Material.Rounded.AutoMode,
+        false => Icons.Material.Outlined.DarkMode,
+    };
 }

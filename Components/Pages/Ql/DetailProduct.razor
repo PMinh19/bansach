@@ -12,7 +12,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 <div style="display:flex;  justify-content:center ;padding: 30px 30px 0 30px; text-align:center">
-    <h2 style="font-family:Arial;">THÔNG TIN SÁCH</h2>  
+    <h2 style="font-family:Arial;">THÔNG TIN SÁCH</h2>
 </div>
 <MudGrid>
     <MudItem xs="12" sm="12">
@@ -26,13 +26,13 @@
                                 <MudCardContent>
                                     <MudGrid>
                                         <MudItem xs="6" sm="6" md="6">
-                                            <MudTextField ShrinkLabel   Variant="Variant.Outlined" Label="Tên" @bind-Value="product.ProductName" />
+                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Tên" @bind-Value="product.ProductName" />
                                         </MudItem>
                                         <MudItem xs="6" sm="6" md="6">
-                                            <MudTextField ShrinkLabel  Variant="Variant.Outlined" Label="Tác giả " @bind-Value="product.Author" />
+                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Tác giả " @bind-Value="product.Author" />
                                         </MudItem>
-                                        
-                                    </MudGrid>                            
+
+                                    </MudGrid>
                                     <MudItem xs="12" sm="12" md="12">
                                         <MudTextField ShrinkLabel Variant="Variant.Outlined" Rows="4" Style="width: 100%;" AutoComplete Multiline="true" Label="Mô tả" @bind-Value="product.Description" />
                                     </MudItem>
@@ -40,17 +40,17 @@
                                         <MudItem xs="6" sm="6" md="6">
                                             <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Năm sản xuất" @bind-Value="product.Year" />
                                         </MudItem>
-                                    <MudItem xs="6" sm="6" md="6">
-                                        <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Nhà xuất bản" @bind-Value="product.Publisher" />
-                                    </MudItem>
+                                        <MudItem xs="6" sm="6" md="6">
+                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Nhà xuất bản" @bind-Value="product.Publisher" />
+                                        </MudItem>
                                     </MudGrid>
                                     <MudGrid>
-                                    <MudItem xs="4" sm="4" md="4">
-                                        <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Giá gốc" @bind-Value="product.CostPrice" />
-                                    </MudItem>
                                         <MudItem xs="4" sm="4" md="4">
-                                        <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Giá bán" @bind-Value="product.SellPrice" />
-                                    </MudItem>
+                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Giá gốc" @bind-Value="product.CostPrice" />
+                                        </MudItem>
+                                        <MudItem xs="4" sm="4" md="4">
+                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Giá bán" @bind-Value="product.SellPrice" />
+                                        </MudItem>
                                         <MudItem xs="4" sm="4" md="4">
                                             <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Số lượng" @bind-Value="product.Quatity" />
                                         </MudItem>
@@ -60,31 +60,30 @@
                                             <MudTextField ReadOnly Variant="Variant.Outlined" ShrinkLabel Label="Thời gian tạo" @bind-Value="product.Created" />
                                         </MudItem>
                                         <MudItem xs="6" sm="6" md="6">
-                                            <MudTextField ReadOnly  Variant="Variant.Outlined" ShrinkLabel Label="Thời gian sửa" @bind-Value="product.Updated" />
+                                            <MudTextField ReadOnly Variant="Variant.Outlined" ShrinkLabel Label="Thời gian sửa" @bind-Value="product.Updated" />
                                         </MudItem>
                                     </MudGrid>
                                     <MudGrid>
-                                    
-                                    <MudItem  xs="6" md="6">
-                                        <MudSelect ShrinkLabel Label="Danh mục" Dense="true" Variant="Variant.Outlined"  T="int" @bind-Value="product.CategoryId">
-                                            @foreach (var category in Categories)
-                                            {
-                                                <MudSelectItem Value="@category.CategoryId">
-                                                    <MudText Class="mb-1">@category.CategoryName</MudText>
-                                                </MudSelectItem>
-                                            }
-                                        </MudSelect>
-                                    </MudItem>
+
+                                        <MudItem xs="6" md="6">
+                                            <MudSelect ShrinkLabel Label="Danh mục" Dense="true" Variant="Variant.Outlined" T="int" @bind-Value="product.CategoryId">
+                                                @foreach (var category in Categories)
+                                                {
+                                                    <MudSelectItem Value="@category.CategoryId">
+                                                        <MudText Class="mb-1">@category.CategoryName</MudText>
+                                                    </MudSelectItem>
+                                                }
+                                            </MudSelect>
+                                        </MudItem>
+                                        <MudItem xs="6" sm="6" md="6">
+                                            <MudTextField Variant="Variant.Outlined" ShrinkLabel Label="Số trang" @bind-Value="product.PageNumber" />
+                                        </MudItem>
+                                    </MudGrid>
+                                    <MudGrid>
                                         <MudItem xs="6" sm="6" md="6">
                                             <MudTextField Variant="Variant.Outlined" ShrinkLabel Label="Ảnh" @bind-Value="product.Img" />
                                         </MudItem>
                                     </MudGrid>
-                                    @* <MudGrid>
-                                <MudItem xs="6" sm="6">
-
-                                </MudItem>
-
-                                </MudGrid> *@
                                 </MudCardContent>
                             </MudCard>
                         </MudItem>
@@ -134,7 +133,7 @@
 @code {
     public int categoryId;
     public string? categoryName;
-    private Product? product; 
+    private Product? product;
     private Category category = new Category();
     private List<Category> Categories = new List<Category>();
     public List<Product> products = new List<Product>();
@@ -145,7 +144,7 @@
     public int productId { get; set; }
     private List<string> uploadedImages = new List<string>();
     private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
-    
+
     public async Task<Product> GetProduct()
     {
         var product = await ItemManagement.GetItemById(productId);
@@ -153,7 +152,7 @@
         // {
         //     throw new Exception("Product not found");
         // }
-         return product;
+        return product;
     }
 
     public async Task<Category> GetCategory()

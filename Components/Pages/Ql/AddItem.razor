@@ -67,15 +67,14 @@
                                             </MudSelect>
                                         </MudItem>
                                         <MudItem xs="6" sm="6" md="6">
-                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Ảnh bìa" @bind-Value="product.Img" />
+                                            <MudTextField Variant="Variant.Outlined" ShrinkLabel Label="Số trang" @bind-Value="product.PageNumber" />
                                         </MudItem>
                                     </MudGrid>
-                                    @* <MudGrid>
-                                <MudItem xs="6" sm="6">
-
-                                </MudItem>
-
-                                </MudGrid> *@
+                                    <MudGrid>
+                                        <MudItem xs="6" sm="6" md="6">
+                                            <MudTextField Variant="Variant.Outlined" ShrinkLabel Label="Ảnh" @bind-Value="product.Img" />
+                                        </MudItem>
+                                    </MudGrid>              
                                 </MudCardContent>
                             </MudCard>
                         </MudItem>

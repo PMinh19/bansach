@@ -1,0 +1,143 @@
+﻿@page "/Detail/{productId:int}"
+@using BanSach.Components.Model
+@using BanSach.Components.Services
+@using BanSach.Components.IService
+@using Microsoft.AspNetCore.Http
+@using System.IO
+@using System.Globalization
+@inject IWebHostEnvironment Environment
+@inject NavigationManager navigationManager
+@inject IItemManagement ItemManagement
+@inject HttpClient httpClient
+@rendermode InteractiveServer
+@inject IDialogService DialogService
+@inject ICartService CartService
+@inject ISnackbar Snackbar
+<MudGrid Class="pt-2">
+    <MudItem xs="12" sm="12">
+        @if (product != null)
+        {
+            <MudGrid>
+                <MudItem xs="0" sm="1" md="1"></MudItem>
+                <MudItem xs="12" sm="5" md="5">
+                    <MudImage ObjectFit="ObjectFit.Cover" Width="300" Height="300" Src="@product.Img" Class="rounded-lg" />
+                </MudItem>
+                <MudItem md="6" sm="6" xs="12">
+                    <div style="padding: 30px">
+                        <MudGrid style="display: flex; flex-direction: column;">
+                            <MudGrid>
+                                <MudItem Class="pt-1">
+                                    <div style="font-weight:bold; font-size: 2em; padding-top: 10px">@product.ProductName</div>
+                                </MudItem>
+                            </MudGrid>
+                            <MudGrid Style="padding-top:10px; display: flex; align-items: center;">
+                                <MudItem Class="pt-1" md="4" sm="4" xs="4" style="margin-top: 0;">
+                                    <MudRating Disabled="true" SelectedValue="4" />
+                                </MudItem>
+                                <MudItem Class="pt-1" md="8" sm="8" xs="8">
+                                    <div>Lượt mua:</div>
+                                </MudItem>
+                            </MudGrid>
+                        </MudGrid>
+                        <MudItem Class="pt-1"><div style=" font-weight:bold; font-size: 2em">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", product.SellPrice) vnđ </div></MudItem>
+                        <MudItem Class="pt-1"><div>Chính sách trả hàng: Trả hàng trong 15 ngày</div></MudItem>
+                        <MudItem>
+                            <div style="display: flex; align-items: center;">
+                                Số lượng:<MudNumericField T="int" @bind-Value="@quantity" Min="0" Style="margin-left: 10px; width: 50px;" />
+                                @* <button @onclick="DecreaseQuantity" >-</button>
+                            <button @onclick="IncreaseQuantity" >+</button> *@
+                            </div>
+                        </MudItem>
+                        <MudItem>
+                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Mua hàng</MudButton>
+                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled" OnClick="AddCart">Thêm vào giỏ hàng</MudButton>
+                        </MudItem>
+
+                    </div>
+                </MudItem>
+            </MudGrid>
+            <MudGrid>
+                <MudItem md="1"></MudItem>
+                <MudItem md="10" sm="10" xs="12">
+                    <div style="font-weight:bold"><h2>CHI TIẾT SẢN PHẨM</h2> </div>
+                    <div><strong>Danh mục:</strong>@categoryName</div>
+                    <div><strong>Tác giả:       </strong>@product.Author</div>
+                    <div><strong>Nhà xuất bản:  </strong>@product.Publisher</div>
+                    <div><strong>Số trang:      </strong>@product.PageNumber</div>
+                    <div><strong>Kho:           </strong>@product.Quatity</div>
+                    <div><strong>Năm sản xuất:  </strong>@product.Year </div>
+                    <br />
+                    <div style="font-weight: bold"><h2>MÔ TẢ SẢN PHẨM: </h2></div>
+                    <div>@product.Description</div>
+                </MudItem>
+            </MudGrid>
+        }
+        else
+        {
+            <MudText Color="Color.Error">Sản phẩm không tồn tại.</MudText>
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    public int quantity;
+    public int categoryId;
+    public string? categoryName;
+    private Product? product;
+    private Product_cart product_cart = new Product_cart();
+    private User user = new User();
+    private Category category = new Category();
+    private List<Category> Categories = new List<Category>();
+    public List<Product> products = new List<Product>();
+    [Parameter]
+    public int productId { get; set; }
+    private List<string> uploadedImages = new List<string>();
+    private List<IBrowserFile> selectedFiles = new List<IBrowserFile>();
+
+    public async Task<Product> GetProduct()
+    {
+        var product = await ItemManagement.GetItemById(productId);
+        if (product == null)
+        {
+            throw new Exception("Product not found");
+        }
+        return product;
+    }
+
+    public async Task<Category> GetCategory()
+    {
+        var category = await ItemManagement.GetCategoryById(categoryId);
+        if (category == null)
+        {
+            throw new Exception("Category not found");
+        }
+        return category;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        product = await GetProduct();
+        categoryId = product.CategoryId;
+        category = await GetCategory();
+        categoryName = category.CategoryName;
+
+        try
+        {
+            Categories = await ItemManagement.GetAllCategogy();
+
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("Lỗi trong OnInitializedAsync: " + ex.Message);
+        }
+    }
+    private async Task<Product_cart> CreatProductCart() => await CartService.CreatePCart( product_cart);
+    private async Task AddCart()
+    {
+        DateTime thoigian = DateTime.Now;
+        // user.UserId = product_cart.UserId;
+        thoigian = product_cart.Created;
+        product_cart.ProductId = product.ProductId;
+        quantity = product_cart.Quatity;
+        await CreatProductCart();
+    }
+}

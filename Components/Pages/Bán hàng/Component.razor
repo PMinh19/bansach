@@ -1,0 +1,75 @@
+﻿@page "/cart"
+@using BanSach.Components.Model
+@using BanSach.Components.Services
+@using BanSach.Components.IService
+@using Microsoft.AspNetCore.Http
+@using System.Globalization
+@inject IWebHostEnvironment Environment
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+@inject IItemManagement ItemManagement
+@rendermode InteractiveServer
+@inject IDialogService DialogService
+@inject ICartService CartService
+<MudGrid Class="pt-2">
+    <MudItem xs="12" sm="12">
+        @if (product_cart != null)
+        {
+            <MudGrid>
+                <MudItem xs="0" sm="1" md="1"></MudItem>
+                <MudItem xs="4" sm="4" md="4">
+                    <MudImage ObjectFit="ObjectFit.Cover" Width="150" Height="150" Src="@product.Img" Class="rounded-lg" />
+                </MudItem>
+                <MudItem md="8" sm="8" xs="8">
+                    <div style="padding: 30px">
+                        <MudGrid style="display: flex; flex-direction: column;">
+                            <MudGrid>
+                                <MudItem Class="pt-1">
+                                    <div style="font-weight:bold; padding-top: 10px">@product.ProductName</div>
+                                </MudItem>
+                            </MudGrid>                           
+                        </MudGrid>
+                        <MudItem Class="pt-1"><div style=" font-weight:bold">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", product.SellPrice) vnđ </div></MudItem>                      
+                        <MudItem>
+                            <div style="display: flex; align-items: center;">
+                                Số lượng:<MudNumericField T="int" @bind-Value="@product_cart.Quatity" Min="0" Style="margin-left: 10px; width: 20px;" />                              
+                            </div>
+                        </MudItem>
+                        <MudItem>
+                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Mua hàng</MudButton>                         
+                        </MudItem>
+
+                    </div>
+                </MudItem>
+            </MudGrid>
+            
+        }
+        else
+        {
+            <MudText Color="Color.Error">Giỏ hàng trống.</MudText>
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    private int productId;
+    private Product product = new Product();
+    private Product_cart product_cart = new Product_cart();
+    private List<Product_cart> product_carts = new List<Product_cart>();
+    private async Task<List<Product_cart>> GetAllProductCart() => await CartService.GetAllPCart();
+    public async Task<Product> GetProduct()
+    {
+        var product = await ItemManagement.GetItemById(productId);
+        if (product == null)
+        {
+            throw new Exception("Product not found");
+        }
+        return product;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        product_carts = await GetAllProductCart();
+        productId = product_cart.ProductId;
+        product = await GetProduct();
+    }
+}
