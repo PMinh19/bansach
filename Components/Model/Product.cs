@@ -11,7 +11,7 @@
         public int CostPrice { get; set; }
         public string? Description { get; set; }
         public int SellPrice { get; set; }
-        public int Quatity { get; set; }
+        public int Quantity { get; set; }
         public int PageNumber { get; set; }
         public string? Img { get; set; }
         public DateTime? Created { get; set; }

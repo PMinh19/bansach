@@ -1,80 +1,76 @@
 ﻿@page "/login"
+@using Microsoft.AspNetCore.WebUtilities
+@inject IAuthService AuthService
+@inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
-@using System.ComponentModel.DataAnnotations
+@using BanSach.Components.Model
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using BanSach.Components.IService
+@inject ICartService CartService
+<PageTitle>Login</PageTitle>
 
-<div class="login-body">
-    <div id="wrapper">
-        <img src="~/images/bg.jpg" alt="BackgroundLogin" class="BackgroundLogin-image" />
-        <div id="form-login" class="form-container">
+<h3>Login</h3>
 
-            <EditForm Model="loginModel" OnValidSubmit="@ProcessLogin" FormName="loginForm">
-                <h1 class="form-heading">Login</h1>
+<EditForm Model="user" OnValidSubmit="HandleLogin" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-                <div class="form-group">
-                    <InputText class="form-input" @bind-Value="loginModel.Username" placeholder="Username" />
-                    <ValidationMessage For="@(() => loginModel.Username)" />
-                </div>
-
-                <div class="form-group">
-                    <InputText @bind-Value="loginModel.Password" type="@passwordInputType" class="form-input" placeholder="Password" />
-                    <div id="eye" @onclick="TogglePasswordVisibility" style="cursor:pointer">
-                        <i class="far @(isPasswordVisible ? "fa-eye-slash" : "fa-eye")"></i>
-                    </div>
-                    <ValidationMessage For="@(() => loginModel.Password)" />
-                </div>
-
-                <div class="form-forgot">
-                    <NavLink class="form-forgot" href="/ForgotPassword" Match="NavLinkMatch.All" style="cursor:pointer">Forgot Password?</NavLink>
-                </div>
-
-                <button type="submit" class="form-submit">Login</button> <br />
-
-                <div class="form-link">
-                    <label>Don't have an account?</label>
-                    <NavLink class="form-forgot" href="/SignUp" Match="NavLinkMatch.All" style="cursor:pointer">Sign Up</NavLink><br />
-                </div>
-
-                <div>
-                    <span></span><span>or</span><span></span><br />
-                    <NavLink class="form-facebook" href="/LoginwithFacebook" Match="NavLinkMatch.All" style="cursor: pointer;">Login with Facebook</NavLink>
-                </div>
-            </EditForm>
-
-        </div>
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="user.Email" class="form-control" type ="email" />
+        <ValidationMessage For="@(() => user.Email)" />
     </div>
-</div>
+
+    <div class="mb-3">
+        <label for="password">Password</label>
+        <InputText id="password" @bind-Value="user.Password" class="form-control" type="password" />
+        <ValidationMessage For="@(() => user.Password)" />
+    </div>
+    <button type="submit" >Login</button>
+
+    <div class="text-danger">
+        <span>@errorMessage</span>
+    </div>
+    <div class="form-link">
+        <label>Don't have an account?</label>
+        <NavLink class="form-forgot" href="/register" style="cursor:pointer">Register</NavLink><br />
+    </div>
+
+    <div>
+        <span>or</span><br />
+        <NavLink class="form-forgot" href="/LoginwithFacebook" style="cursor:pointer">Login with Facebook</NavLink><br />
+    </div>
+</EditForm>
 
 @code {
-    private LoginModel loginModel = new LoginModel();
-    private bool isPasswordVisible = false;
-    private string passwordInputType => isPasswordVisible ? "text" : "password";
-
-    public class LoginModel
+    private UserLogin user = new UserLogin();
+    private string errorMessage = string.Empty;
+    private string returnUrl = string.Empty;
+    protected override void OnInitialized()
     {
-        [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
-        public string Username { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
-        public string Password { get; set; } = string.Empty;
-    }
-
-    private void ProcessLogin()
-    {
-        // Logic xử lý đăng nhập
-        if (loginModel.Username == "admin" && loginModel.Password == "123")
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if(QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var url))
         {
-            Console.WriteLine("Đăng nhập thành công");
-            NavigationManager.NavigateTo("/"); 
+            returnUrl = url;
+        }
+    }
+    private async Task HandleLogin()
+    {
+        var result = await AuthService.Login(user.Email, user.Password);
+        if (result.Success)
+        {
+            errorMessage = string.Empty;
+
+            await LocalStorage.SetItemAsync("authToken", result.Data);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            
+            StateHasChanged();
+            NavigationManager.NavigateTo(returnUrl);
         }
         else
         {
-            Console.WriteLine("Đăng nhập thất bại");
-            // Có thể thêm logic hiển thị thông báo lỗi
+            errorMessage = result.Message;
         }
     }
 
-    private void TogglePasswordVisibility()
-    {
-        isPasswordVisible = !isPasswordVisible; // Chuyển đổi trạng thái hiển thị mật khẩu
-    }
 }

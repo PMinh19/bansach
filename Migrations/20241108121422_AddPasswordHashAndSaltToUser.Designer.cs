@@ -4,6 +4,7 @@ using BanSach.Components.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BanSach.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241108121422_AddPasswordHashAndSaltToUser")]
+    partial class AddPasswordHashAndSaltToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -292,7 +295,7 @@ namespace BanSach.Migrations
                     b.Property<string>("Publisher")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("Quatity")
                         .HasColumnType("int");
 
                     b.Property<int>("SellPrice")
@@ -342,22 +345,25 @@ namespace BanSach.Migrations
 
             modelBuilder.Entity("BanSach.Components.Model.Product_cart", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("CartId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartId"));
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quatity")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Updated")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("UserId", "ProductId");
+                    b.HasKey("CartId");
 
                     b.ToTable("Product_carts");
                 });
@@ -448,20 +454,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("BanSach.Components.Model.User", b =>
-                {
-                    b.HasOne("BanSach.Components.Model.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

@@ -52,7 +52,7 @@
                                             <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Giá bán" @bind-Value="product.SellPrice" />
                                         </MudItem>
                                         <MudItem xs="4" sm="4" md="4">
-                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Số lượng" @bind-Value="product.Quatity" />
+                                            <MudTextField ShrinkLabel Variant="Variant.Outlined" Label="Số lượng" @bind-Value="product.Quantity" />
                                         </MudItem>
                                     </MudGrid>                                  
                                     <MudGrid>
@@ -194,7 +194,7 @@
             return;
         }
 
-        if (product.Quatity < 0)
+        if (product.Quantity < 0)
         {
             errorMessage = "Số lượng không được âm.";
             success = false;

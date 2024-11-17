@@ -9,6 +9,7 @@ namespace BanSach.Components.Data
         {
 
         }
+
         public DbSet<Address> Address { get; set; }
         public DbSet<Bill> Bill { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -71,12 +72,8 @@ namespace BanSach.Components.Data
             modelBuilder.Entity<Product_bill>()
                 .Property(m => m.ProductBillId)
                 .ValueGeneratedOnAdd();
-
             modelBuilder.Entity<Product_cart>()
-                .HasKey(m => m.CartId);
-            modelBuilder.Entity<Product_cart>()
-                .Property(m => m.CartId)
-                .ValueGeneratedOnAdd();
+                .HasKey(m => new { m.UserId, m.ProductId });
 
             modelBuilder.Entity<Product>()
                 .HasKey(m => m.ProductId);
@@ -101,7 +98,7 @@ namespace BanSach.Components.Data
             modelBuilder.Entity<User>()
                 .Property(m => m.UserId)
                 .ValueGeneratedOnAdd();
-
+           
         }
     }
 }
