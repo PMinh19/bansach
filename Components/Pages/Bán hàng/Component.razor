@@ -37,7 +37,9 @@
                                 Số lượng:<MudNumericField T="int" @bind-Value="@product_cart.Quantity" Min="0" Style="margin-left: 10px; width: 20px;" />
                             </div>
                         </MudItem>
-                       
+                        <MudItem>
+                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled" @onclick="HandleBuyNow">Mua hàng</MudButton>
+                        </MudItem>
 
                     </div>
                 </MudItem>
@@ -72,7 +74,47 @@
         productId = product_cart.ProductId;
         product = await GetProduct();
     }
-   
+    private async Task HandleBuyNow()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user == null || !user.Identity.IsAuthenticated)
+        {
+            DialogService.ShowMessageBox("Lỗi", "Vui lòng đăng nhập để tiếp tục.");
+            return;
+        }
+
+        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+        {
+            DialogService.ShowMessageBox("Lỗi", "Không thể xác định người dùng.");
+            return;
+        }
+        int userId = int.Parse(userIdClaim.Value);
+
+        var productBill = new Product_bill
+            {
+                FeaturePId = product_cart.ProductId,
+                Price = product_cart.Quantity * product.SellPrice,
+                Quatity = product_cart.Quantity,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+            };
+
+        var productBillResult = await CartService.PlaceProductBill(productBill);
+
+        if (productBillResult != null)
+        {
+            navigationManager.NavigateTo($"/invoice/{productBillResult.ProductBillId}");
+        }
+        else
+        {
+            DialogService.ShowMessageBox("Lỗi", "Đặt hàng không thành công. Vui lòng thử lại.");
+        }
+    }
+
+
     
 
 }
