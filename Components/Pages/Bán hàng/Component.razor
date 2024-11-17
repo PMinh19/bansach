@@ -1,9 +1,11 @@
 ﻿@page "/cart"
+@using System.Security.Claims
 @using BanSach.Components.Model
 @using BanSach.Components.Services
 @using BanSach.Components.IService
 @using Microsoft.AspNetCore.Http
 @using System.Globalization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IWebHostEnvironment Environment
 @inject HttpClient httpClient
 @inject NavigationManager navigationManager
@@ -35,9 +37,7 @@
                                 Số lượng:<MudNumericField T="int" @bind-Value="@product_cart.Quantity" Min="0" Style="margin-left: 10px; width: 20px;" />
                             </div>
                         </MudItem>
-                        <MudItem>
-                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Mua hàng</MudButton>
-                        </MudItem>
+                       
 
                     </div>
                 </MudItem>
@@ -72,4 +72,7 @@
         productId = product_cart.ProductId;
         product = await GetProduct();
     }
+   
+    
+
 }
