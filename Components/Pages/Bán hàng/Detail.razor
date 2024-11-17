@@ -64,7 +64,7 @@
                     <div><strong>Tác giả:       </strong>@product.Author</div>
                     <div><strong>Nhà xuất bản:  </strong>@product.Publisher</div>
                     <div><strong>Số trang:      </strong>@product.PageNumber</div>
-                    <div><strong>Kho:           </strong>@product.Quatity</div>
+                    <div><strong>Kho:           </strong>@product.Quantity</div>
                     <div><strong>Năm sản xuất:  </strong>@product.Year </div>
                     <br />
                     <div style="font-weight: bold"><h2>MÔ TẢ SẢN PHẨM: </h2></div>
@@ -130,14 +130,14 @@
             System.Diagnostics.Debug.WriteLine("Lỗi trong OnInitializedAsync: " + ex.Message);
         }
     }
-    private async Task<Product_cart> CreatProductCart() => await CartService.CreatePCart( product_cart);
+    private async Task<Product_cart> CreatProductCart() => await CartService.CreatePCart(product_cart);
     private async Task AddCart()
     {
         DateTime thoigian = DateTime.Now;
         // user.UserId = product_cart.UserId;
         thoigian = product_cart.Created;
         product_cart.ProductId = product.ProductId;
-        quantity = product_cart.Quatity;
+        quantity = product_cart.Quantity;
         await CreatProductCart();
     }
 }

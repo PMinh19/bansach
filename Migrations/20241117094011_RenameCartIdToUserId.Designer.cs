@@ -4,6 +4,7 @@ using BanSach.Components.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BanSach.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241117094011_RenameCartIdToUserId")]
+    partial class RenameCartIdToUserId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -292,7 +295,7 @@ namespace BanSach.Migrations
                     b.Property<string>("Publisher")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("Quatity")
                         .HasColumnType("int");
 
                     b.Property<int>("SellPrice")

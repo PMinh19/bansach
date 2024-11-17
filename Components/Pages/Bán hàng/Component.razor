@@ -27,22 +27,22 @@
                                 <MudItem Class="pt-1">
                                     <div style="font-weight:bold; padding-top: 10px">@product.ProductName</div>
                                 </MudItem>
-                            </MudGrid>                           
+                            </MudGrid>
                         </MudGrid>
-                        <MudItem Class="pt-1"><div style=" font-weight:bold">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", product.SellPrice) vnđ </div></MudItem>                      
+                        <MudItem Class="pt-1"><div style=" font-weight:bold">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", product.SellPrice) vnđ </div></MudItem>
                         <MudItem>
                             <div style="display: flex; align-items: center;">
-                                Số lượng:<MudNumericField T="int" @bind-Value="@product_cart.Quatity" Min="0" Style="margin-left: 10px; width: 20px;" />                              
+                                Số lượng:<MudNumericField T="int" @bind-Value="@product_cart.Quantity" Min="0" Style="margin-left: 10px; width: 20px;" />
                             </div>
                         </MudItem>
                         <MudItem>
-                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Mua hàng</MudButton>                         
+                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled">Mua hàng</MudButton>
                         </MudItem>
 
                     </div>
                 </MudItem>
             </MudGrid>
-            
+
         }
         else
         {

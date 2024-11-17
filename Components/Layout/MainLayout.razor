@@ -1,34 +1,62 @@
 ﻿@inherits LayoutComponentBase
-<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"  @rendermode="InteractiveServer" />
-<MudPopoverProvider @rendermode="InteractiveServer" />
-<MudDialogProvider @rendermode="InteractiveServer" />
-<MudSnackbarProvider @rendermode="InteractiveServer" />
-<MudLayout>
-    <!-- Thanh AppBar của MainLayout -->
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">
-            <a href="/" style="text-decoration: none; color: inherit;">WebBookApp</a>
-        </MudText>
-        <MudSpacer />
-        <!-- Bắt đầu phần AppBar từ Home.razor -->
-        <MudTextField T="string" Icon="@Icons.Material.Filled.Search" Placeholder="Tìm kiếm..."
-                      Style=" margin: 0 10px;" />
-        <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Href="/cart" />
-        <MudIconButton Href="/login" Icon="@Icons.Material.Filled.AccountCircle" />
-        <!-- Nút chuyển đổi chế độ sáng/tối -->
-        <MudIconButton Icon="@DarkLightModeButtonIcon" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
-    </MudAppBar>
+@inject ILocalStorageService LocalStorage
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu />
-    </MudDrawer>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+<CascadingAuthenticationState>
+    <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" @rendermode="InteractiveServer" />
+    <MudPopoverProvider @rendermode="InteractiveServer" />
+    <MudDialogProvider @rendermode="InteractiveServer" />
+    <MudSnackbarProvider @rendermode="InteractiveServer" />
+    <MudLayout>
+        <!-- Thanh AppBar của MainLayout -->
+        <MudAppBar Elevation="1">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudText Typo="Typo.h5" Class="ml-3">
+                <a href="/" style="text-decoration: none; color: inherit;">WebBookApp</a>
+            </MudText>
+            <MudSpacer />
+            <!-- Bắt đầu phần AppBar từ Home.razor -->
+            <MudTextField T="string" Icon="@Icons.Material.Filled.Search" Placeholder="Tìm kiếm..."
+                          Style=" margin: 0 10px;" />
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Href="/cart" />
+            <AuthorizeView>
+                <Authorized>
+                    <MudMenu Icon="@Icons.Material.Filled.AccountCircle"
+                             AriaLabel="Open user menu">
+                             
+                        <a href="/profile" class="dropdown-item">Profile</a>
+                        <hr />
+                        <button @onclick="Logout">Logout</button>
+                    </MudMenu>
+                </Authorized>
+                <NotAuthorized>
+                    <MudMenu Icon="@Icons.Material.Filled.AccountCircle"
+                             AriaLabel="Open user menu">
+                        <a href="/profile" class="dropdown-item">Profile</a>
+                        <hr />
+                        <a href="login?returnUrl=@NavigationManager.ToBaseRelativePath(NavigationManager.Uri)" class="dropdown-item">Login</a>
+                        <hr/>
+                        <a href="/register" class="dropdown-item">Register</a>
+                       
+                    </MudMenu>
+                </NotAuthorized>
+            </AuthorizeView>
+            <!-- Nút chuyển đổi chế độ sáng/tối -->
+            <MudIconButton Icon="@DarkLightModeButtonIcon" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+            <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        </MudAppBar>
+
+        <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+            <NavMenu />
+        </MudDrawer>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
+</CascadingAuthenticationState>
+
 <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
@@ -36,6 +64,7 @@
 </div>
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
 <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+
 @code {
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
@@ -44,7 +73,6 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
         _theme = new()
             {
                 PaletteLight = _lightPalette,
@@ -52,8 +80,15 @@
                 LayoutProperties = new LayoutProperties()
             };
     }
-
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Xử lý hoàn thành prerendering và khởi tạo trạng thái xác thực
+            ((CustomAuthStateProvider)AuthenticationStateProvider).NotifyPrerenderCompleted();
+            ((CustomAuthStateProvider)AuthenticationStateProvider).InitializeAuthenticationStateAsync();
+        }
+    }
     private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -108,4 +143,12 @@
         true => Icons.Material.Rounded.AutoMode,
         false => Icons.Material.Outlined.DarkMode,
     };
+
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("authToken");
+        ((CustomAuthStateProvider)AuthenticationStateProvider).InitializeAuthenticationStateAsync();
+        StateHasChanged();
+        NavigationManager.NavigateTo("/login");
+    }
 }

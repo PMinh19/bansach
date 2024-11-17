@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BanSach.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241104173053_v4")]
+    [Migration("20241108002555_v4")]
     partial class v4
     {
         /// <inheritdoc />
