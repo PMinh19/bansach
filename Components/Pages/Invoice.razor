@@ -1,0 +1,51 @@
+﻿@page "/invoice/{productBillId:int}"
+@using BanSach.Components.IService
+@inject ICartService CartService
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+
+<MudGrid>
+    <MudItem xs="12">
+        <h2>Hóa Đơn</h2>
+        <MudText Typo="Typo.h6">Thông tin chi tiết hóa đơn</MudText>
+        @if (productBill != null)
+        {
+            <MudGrid>
+                <MudItem xs="12">
+                    <div><strong>Mã hóa đơn:</strong> @productBill.ProductBillId</div>
+                    <div><strong>Tên sản phẩm:</strong> @productBill.FeaturePId</div>
+                    <div><strong>Số lượng:</strong> @productBill.Quatity</div>
+                    <div><strong>Giá:</strong> @productBill.Price vnđ</div>
+                    <div><strong>Ngày tạo:</strong> @productBill.Created</div>
+                </MudItem>
+            </MudGrid>
+        }
+        else
+        {
+            <MudText Color="Color.Error">Không tìm thấy hóa đơn.</MudText>
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public int productBillId { get; set; }
+    private Product_bill? productBill;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Lấy hóa đơn từ service bằng ProductBillId
+        try
+        {
+            productBill = await CartService.GetProductBillById(productBillId);
+            if (productBill == null)
+            {
+                DialogService.ShowMessageBox("Lỗi", "Không tìm thấy hóa đơn.");
+            }
+        }
+        catch (Exception ex)
+        {
+            DialogService.ShowMessageBox("Lỗi", "Có lỗi xảy ra: " + ex.Message);
+        }
+    }
+}
