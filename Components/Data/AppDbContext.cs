@@ -74,6 +74,11 @@ namespace BanSach.Components.Data
                 .ValueGeneratedOnAdd();
             modelBuilder.Entity<Product_cart>()
                 .HasKey(m => new { m.UserId, m.ProductId });
+            modelBuilder.Entity<Product_cart>()
+               .HasOne(pc => pc.Product)   // Mối quan hệ với Product
+               .WithMany()                  // Một sản phẩm có thể có nhiều giỏ hàng
+               .HasForeignKey(pc => pc.ProductId)  // Khóa ngoại tham chiếu đến bảng Products
+               .OnDelete(DeleteBehavior.Cascade);  // Xóa giỏ hàng nếu sản phẩm bị xóa
 
             modelBuilder.Entity<Product>()
                 .HasKey(m => m.ProductId);

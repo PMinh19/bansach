@@ -13,38 +13,41 @@
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 @inject ICartService CartService
+
 <MudGrid Class="pt-2">
     <MudItem xs="12" sm="12">
-        @if (product_cart != null)
+        @if (product_carts != null && product_carts.Any())
         {
-            <MudGrid>
-                <MudItem xs="0" sm="1" md="1"></MudItem>
-                <MudItem xs="4" sm="4" md="4">
-                    <MudImage ObjectFit="ObjectFit.Cover" Width="150" Height="150" Src="@product.Img" Class="rounded-lg" />
-                </MudItem>
-                <MudItem md="8" sm="8" xs="8">
-                    <div style="padding: 30px">
-                        <MudGrid style="display: flex; flex-direction: column;">
-                            <MudGrid>
-                                <MudItem Class="pt-1">
-                                    <div style="font-weight:bold; padding-top: 10px">@product.ProductName</div>
-                                </MudItem>
+            @foreach (var cartItem in product_carts)
+            {
+                <MudGrid>
+                    <MudItem xs="0" sm="1" md="1"></MudItem>
+                    <MudItem xs="4" sm="4" md="4">
+                        <MudImage ObjectFit="ObjectFit.Cover" Width="150" Height="150" Src="@cartItem.Product.Img" Class="rounded-lg" />
+                    </MudItem>
+                    <MudItem md="8" sm="8" xs="8">
+                        <div style="padding: 30px">
+                            <MudGrid style="display: flex; flex-direction: column;">
+                                <MudGrid>
+                                    <MudItem Class="pt-1">
+                                        <div style="font-weight:bold; padding-top: 10px">@cartItem.Product.ProductName</div>
+                                    </MudItem>
+                                </MudGrid>
                             </MudGrid>
-                        </MudGrid>
-                        <MudItem Class="pt-1"><div style=" font-weight:bold">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", product.SellPrice) vnđ </div></MudItem>
-                        <MudItem>
-                            <div style="display: flex; align-items: center;">
-                                Số lượng:<MudNumericField T="int" @bind-Value="@product_cart.Quantity" Min="0" Style="margin-left: 10px; width: 20px;" />
-                            </div>
-                        </MudItem>
-                        <MudItem>
-                            <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled" @onclick="HandleBuyNow">Mua hàng</MudButton>
-                        </MudItem>
-
-                    </div>
-                </MudItem>
-            </MudGrid>
-
+                            <MudItem Class="pt-1"><div style=" font-weight:bold">@string.Format(new CultureInfo("vi-VN"), "{0:N0}", cartItem.Product.SellPrice) vnđ </div></MudItem>
+                            <MudItem>
+                                <div style="display: flex; align-items: center;">
+                                    Số lượng:
+                                    <MudNumericField T="int" @bind-Value="@cartItem.Quantity" Min="1" Style="margin-left: 10px; width: 50px;" />
+                                </div>
+                            </MudItem>
+                            <MudItem>
+                                <MudButton Class="pt-1" style="padding:10px" ButtonType="ButtonType.Submit" Variant="Variant.Filled" @onclick="() => HandleBuyNow(cartItem)">Mua hàng</MudButton>
+                            </MudItem>
+                        </div>
+                    </MudItem>
+                </MudGrid>
+            }
         }
         else
         {
@@ -54,28 +57,38 @@
 </MudGrid>
 
 @code {
-    private int productId;
-    private Product product = new Product();
-    private Product_cart product_cart = new Product_cart();
     private List<Product_cart> product_carts = new List<Product_cart>();
-    private async Task<List<Product_cart>> GetAllProductCart() => await CartService.GetAllPCart();
-    public async Task<Product> GetProduct()
-    {
-        var product = await ItemManagement.GetItemById(productId);
-        if (product == null)
-        {
-            throw new Exception("Product not found");
-        }
-        return product;
-    }
+
     protected override async Task OnInitializedAsync()
     {
-        product_carts = await GetAllProductCart();
-        productId = product_cart.ProductId;
-        product = await GetProduct();
+        try
+        {
+            product_carts = await GetAllProductCart();
+        }
+        catch (Exception ex)
+        {
+            DialogService.ShowMessageBox("Lỗi", $"Không thể tải giỏ hàng: {ex.Message}");
+        }
     }
-    private async Task HandleBuyNow()
+
+    private async Task<List<Product_cart>> GetAllProductCart()
     {
+        var carts = await CartService.GetAllPCart();
+        if (carts == null || !carts.Any())
+        {
+            return new List<Product_cart>();
+        }
+        return carts;
+    }
+
+    private async Task HandleBuyNow(Product_cart cartItem)
+    {
+        if (cartItem == null || cartItem.Quantity < 1)
+        {
+            DialogService.ShowMessageBox("Lỗi", "Giỏ hàng không hợp lệ.");
+            return;
+        }
+
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -91,30 +104,34 @@
             DialogService.ShowMessageBox("Lỗi", "Không thể xác định người dùng.");
             return;
         }
+
         int userId = int.Parse(userIdClaim.Value);
 
         var productBill = new Product_bill
             {
-                FeaturePId = product_cart.ProductId,
-                Price = product_cart.Quantity * product.SellPrice,
-                Quatity = product_cart.Quantity,
+                FeaturePId = cartItem.ProductId,
+                Price = cartItem.Quantity * cartItem.Product.SellPrice,
+                Quantity = cartItem.Quantity,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
             };
 
-        var productBillResult = await CartService.PlaceProductBill(productBill);
+        try
+        {
+            var productBillResult = await CartService.PlaceProductBill(productBill);
 
-        if (productBillResult != null)
-        {
-            navigationManager.NavigateTo($"/invoice/{productBillResult.ProductBillId}");
+            if (productBillResult != null)
+            {
+                navigationManager.NavigateTo($"/invoice/{productBillResult.ProductBillId}");
+            }
+            else
+            {
+                DialogService.ShowMessageBox("Lỗi", "Đặt hàng không thành công. Vui lòng thử lại.");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            DialogService.ShowMessageBox("Lỗi", "Đặt hàng không thành công. Vui lòng thử lại.");
+            DialogService.ShowMessageBox("Lỗi", $"Không thể đặt hàng: {ex.Message}");
         }
     }
-
-
-    
-
 }
