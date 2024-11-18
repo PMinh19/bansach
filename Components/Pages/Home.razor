@@ -1,20 +1,23 @@
 ﻿@page "/"
 @using BanSach.Components.Model
 @using MudBlazor
- @using System.Data
-@using System.Diagnostics.Metrics
-@using BanSach.Components.IService
 @using System.Globalization
+@using BanSach.Components.IService
 @using BanSach.Components.Services
-@inject IDialogService DialogService
 @inject NavigationManager navigationManager
 @inject IItemManagement ItemManagement
 @inject HttpClient httpClient
-@rendermode InteractiveServer
-@inject IDialogService DialogService
+
 <PageTitle>Home</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="pa-0">
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <MudAlert Severity="Severity.Success" Class="mt-4">
+            @message
+        </MudAlert>
+    }
+
     <!-- Ảnh nổi bật -->
     <div style="display: flex; justify-content: center; width: 80%; margin-top: 20px;">
         <MudCarousel TData="string" Interval="4000" style="height: 400px; width:80%;display: flex; justify-content: center;">
@@ -36,42 +39,35 @@
                      style="width:100%; height: 100%; object-fit: cover; filter: grayscale(0.3);" />
                 <MudCarouselItemText Style="background-color: rgba(51, 51, 51, 0.7); color: #EAEAEA;">Product 3</MudCarouselItemText>
             </MudCarouselItem>
-             <MudCarouselItem>
-                <img src="https://cdn.tgdd.vn/Files/2023/03/09/1515820/10-cuon-sach-self-help-hay-huu-ich-nhat-dinh-phai-doc-mot-lan-202303100820244232.jpg"
-                     alt="Product 4" 
-                     style="width:100%; height: 100%; object-fit: cover; filter: grayscale(0.3);" />
-                <MudCarouselItemText Style="background-color: rgba(51, 51, 51, 0.7); color: #EAEAEA;">Product 3</MudCarouselItemText>
-            </MudCarouselItem>
         </MudCarousel>
     </div>
+
     <MudGrid Class="pt-2">
-    <MudItem xs="12" sm="12">
-        <MudCard>
-            <MudCardContent>
-            @if (products != null)
-            {
-                <MudGrid Mode="@products" Class="anh" Style="display:flex;">
-                    @foreach (var item in products)
-                    {
-                        <MudItem sm="4" md="2" xs="5" >
-                            <Button Class="button" @onclick="() => Detail(item.ProductId)">
-                                <div><img ObjectFit="ObjectFit.Cover" Src="@item.Img" Width="200" Height="230" Class="rounded-lg" /></div>
-                                    <div style="width: 200px; overflow: hidden; white-space: nowrap; ">
-                                        @item.ProductName
-                                    </div>
-                                    <div>@string.Format(new CultureInfo("vi-VN"), "{0:N0}", item.SellPrice) vnđ </div>
-                            </Button>
-                        </MudItem>
-                    }
-                </MudGrid>
-            }
-            <MudScrollToTop TopOffset="100" Selector="#another_unique_identifier" Style="z-index:2001;">
-                <div class="mud-theme-secondary px-3 py-6 mud-elevation-16 rounded-xl fixed" style="bottom:20px;left:20px;">Scroll to top custom button</div>
-            </MudScrollToTop>
+        <MudItem xs="12" sm="12">
+            <MudCard>
+                <MudCardContent>
+                @if (products != null)
+                {
+                    <MudGrid Mode="@products" Class="anh" Style="display:flex;">
+                        @foreach (var item in products)
+                        {
+                            <MudItem sm="4" md="2" xs="5" >
+                                <Button Class="button" @onclick="() => Detail(item.ProductId)">
+                                    <div><img ObjectFit="ObjectFit.Cover" Src="@item.Img" Width="200" Height="230" Class="rounded-lg" /></div>
+                                        <div style="width: 200px; overflow: hidden; white-space: nowrap; ">
+                                            @item.ProductName
+                                        </div>
+                                        <div>@string.Format(new CultureInfo("vi-VN"), "{0:N0}", item.SellPrice) vnđ </div>
+                                </Button>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                }
                 </MudCardContent>
-        </MudCard>
-    </MudItem>
+            </MudCard>
+        </MudItem>
     </MudGrid>
+
     <!-- Footer Section -->
     <MudPaper Class="pa-4 mt-4" Style=" text-align: center; ">
         <MudText>Liên hệ: contact@webbookapp.com</MudText>
@@ -79,6 +75,7 @@
         <MudText>Địa chỉ: số 141, Chiến Thắng, Thanh Trì, Hà Nội</MudText>
     </MudPaper>
 </MudContainer>
+
 <style>
     .button {
         margin: 10px 0 0 10px;
@@ -89,21 +86,48 @@
         font-weight: bold;
     }
 
-        .button:hover {
-            transform: scale(1.05);
-        }
+    .button:hover {
+        transform: scale(1.05);
+    }
 </style>
-@code{
+
+@code {
+    private string message;
     private List<Product> products = new List<Product>();
+
+    // Lấy thông báo từ query string trong URL
+    protected override void OnInitialized()
+    {
+        var uri = navigationManager.Uri;
+        var uriComponents = new Uri(uri).Query.Split('?');
+        
+        if (uriComponents.Length > 1)
+        {
+            var queryParams = System.Web.HttpUtility.ParseQueryString(uriComponents[1]);
+            message = queryParams["message"];
+        }
+    }
+
     private async Task<List<Product>> getAllSach() => await ItemManagement.GetAllItem();
+
     protected override async Task OnInitializedAsync()
     {
-        products = await getAllSach();   
+        products = await getAllSach();
+
+        // Hiển thị thông báo trong 5 giây và ẩn đi sau đó
+        if (!string.IsNullOrEmpty(message))
+        {
+            // Chờ 5 giây rồi xóa thông báo
+            await Task.Delay(5000);
+            message = null;
+        }
     }
+
     private void Detail(int productId)
     {
         navigationManager.NavigateTo($"/Detail/{productId}");
     }
+
     private void Test()
     {
         navigationManager.NavigateTo("/test");

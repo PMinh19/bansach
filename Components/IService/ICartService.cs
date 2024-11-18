@@ -11,6 +11,7 @@ namespace BanSach.Components.IService
         Task<Product_bill> PlaceProductBill(Product_bill productBill);
         Task<Product_bill> GetProductBillById(int productBillId);
         Task<PaymentResult> ProcessPayment(int productBillId, string paymentMethod);
+       
     }
     public class PaymentResult
     {

@@ -19,7 +19,19 @@
                     <div><strong>Số Lượng:</strong> @productBill.Quantity</div>
                     <div><strong>Ngày Tạo:</strong> @productBill.Created</div>
                     <br />
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="HandlePayment">Thanh Toán Tiền Mặt</MudButton>
+                    <MudText Typo="Typo.h6" Class="mud-width-full">@(pay == null ? "Nothing selected." : $"Pay: {pay.Name}")</MudText>
+
+                    <MudSelect T="Pay" @bind-Value="pay" ToStringFunc="@converter" Label="Chọn phương thức thanh toán" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Clearable>
+                        <MudSelectItem Value="@(new Pay() { Name="Tiền mặt"})" />
+                        <MudSelectItem Value="@(new Pay() { Name="Ví điện tử"})" />
+                    </MudSelect>
+
+                    <br />
+
+                    <!-- Nút đặt hàng -->
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="PlaceOrder">
+                        Đặt hàng
+                    </MudButton>
                 </MudItem>
             </MudGrid>
         }
@@ -33,12 +45,15 @@
 @code {
     [Parameter] public int productBillId { get; set; }
     private Product_bill productBill;
+    private Pay pay = new Pay { Name = "Tiền mặt" };  // Mặc định là Tiền mặt
+
+    // Hàm này giúp converter giá trị của Pay để hiển thị trong MudSelect
+    Func<Pay, string> converter = p => p?.Name;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            // Lấy thông tin hóa đơn từ CartService bằng productBillId
             productBill = await CartService.GetProductBillById(productBillId);
         }
         catch (Exception ex)
@@ -47,27 +62,49 @@
         }
     }
 
-    private async Task HandlePayment()
+    private async Task PlaceOrder()
     {
-        // Kiểm tra thanh toán qua tiền mặt
+        // Kiểm tra nếu người dùng chưa chọn phương thức thanh toán
+        if (pay == null || string.IsNullOrEmpty(pay.Name))
+        {
+            DialogService.ShowMessageBox("Lỗi", "Vui lòng chọn phương thức thanh toán.");
+            return;
+        }
+
         try
         {
-            // Gọi phương thức thanh toán tiền mặt từ CartService
-            var paymentResult = await CartService.ProcessPayment(productBill.ProductBillId, "Cash");
+            // Gọi phương thức xử lý thanh toán
+            var paymentResult = await CartService.ProcessPayment(productBill.ProductBillId, pay.Name);
 
             if (paymentResult.IsSuccess)
             {
-                DialogService.ShowMessageBox("Thanh Toán Thành Công", "Thanh toán của bạn đã thành công!");
-                navigationManager.NavigateTo("/home"); // Chuyển hướng về trang chính
+                DialogService.ShowMessageBox("Thành Công", $"Đơn hàng đã được đặt thành công với phương thức: {pay.Name}");
+                navigationManager.NavigateTo("/?message=" + Uri.EscapeDataString("Đơn hàng đã được đặt thành công với phương thức: " + pay.Name));
+
             }
             else
             {
-                DialogService.ShowMessageBox("Lỗi", "Thanh toán không thành công. Vui lòng thử lại.");
+                
+                DialogService.ShowMessageBox("Lỗi", paymentResult.Message);
             }
         }
         catch (Exception ex)
         {
-            DialogService.ShowMessageBox("Lỗi", $"Đã có lỗi trong quá trình thanh toán: {ex.Message}");
+            DialogService.ShowMessageBox("Lỗi", $"Đã xảy ra lỗi: {ex.Message}");
         }
+    }
+
+    // Lớp để lưu thông tin phương thức thanh toán
+    public class Pay
+    {
+        public string Name { get; set; }
+
+        public override bool Equals(object o)
+        {
+            var other = o as Pay;
+            return other?.Name == Name;
+        }
+
+        public override int GetHashCode() => Name.GetHashCode();
     }
 }
