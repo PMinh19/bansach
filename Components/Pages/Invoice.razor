@@ -1,51 +1,73 @@
 ﻿@page "/invoice/{productBillId:int}"
+@using BanSach.Components.Model
 @using BanSach.Components.IService
 @inject ICartService CartService
-@inject NavigationManager NavigationManager
+@inject NavigationManager navigationManager
 @inject IDialogService DialogService
+@using System.Globalization
 
-<MudGrid>
-    <MudItem xs="12">
-        <h2>Hóa Đơn</h2>
-        <MudText Typo="Typo.h6">Thông tin chi tiết hóa đơn</MudText>
+<MudGrid Class="pt-2">
+    <MudItem xs="12" sm="12">
         @if (productBill != null)
         {
             <MudGrid>
-                <MudItem xs="12">
-                    <div><strong>Mã hóa đơn:</strong> @productBill.ProductBillId</div>
-                    <div><strong>Tên sản phẩm:</strong> @productBill.FeaturePId</div>
-                    <div><strong>Số lượng:</strong> @productBill.Quantity</div>
-                    <div><strong>Giá:</strong> @productBill.Price vnđ</div>
-                    <div><strong>Ngày tạo:</strong> @productBill.Created</div>
+                <MudItem xs="12" sm="12" md="12">
+                    <div style="font-weight: bold; font-size: 1.5em;">Hóa Đơn</div>
+                    <div><strong>ID Hóa Đơn:</strong> @productBill.ProductBillId</div>
+                    <div><strong>Tổng Tiền:</strong> @string.Format(new CultureInfo("vi-VN"), "{0:N0}", productBill.Price) vnđ</div>
+                    <div><strong>Sản Phẩm:</strong> @productBill.FeaturePId</div>
+                    <div><strong>Số Lượng:</strong> @productBill.Quantity</div>
+                    <div><strong>Ngày Tạo:</strong> @productBill.Created</div>
+                    <br />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="HandlePayment">Thanh Toán Tiền Mặt</MudButton>
                 </MudItem>
             </MudGrid>
         }
         else
         {
-            <MudText Color="Color.Error">Không tìm thấy hóa đơn.</MudText>
+            <MudText Color="Color.Error">Hóa đơn không tồn tại.</MudText>
         }
     </MudItem>
 </MudGrid>
 
 @code {
-    [Parameter]
-    public int productBillId { get; set; }
-    private Product_bill? productBill;
+    [Parameter] public int productBillId { get; set; }
+    private Product_bill productBill;
 
     protected override async Task OnInitializedAsync()
     {
-        // Lấy hóa đơn từ service bằng ProductBillId
         try
         {
+            // Lấy thông tin hóa đơn từ CartService bằng productBillId
             productBill = await CartService.GetProductBillById(productBillId);
-            if (productBill == null)
+        }
+        catch (Exception ex)
+        {
+            DialogService.ShowMessageBox("Lỗi", $"Không thể tải hóa đơn: {ex.Message}");
+        }
+    }
+
+    private async Task HandlePayment()
+    {
+        // Kiểm tra thanh toán qua tiền mặt
+        try
+        {
+            // Gọi phương thức thanh toán tiền mặt từ CartService
+            var paymentResult = await CartService.ProcessPayment(productBill.ProductBillId, "Cash");
+
+            if (paymentResult.IsSuccess)
             {
-                DialogService.ShowMessageBox("Lỗi", "Không tìm thấy hóa đơn.");
+                DialogService.ShowMessageBox("Thanh Toán Thành Công", "Thanh toán của bạn đã thành công!");
+                navigationManager.NavigateTo("/home"); // Chuyển hướng về trang chính
+            }
+            else
+            {
+                DialogService.ShowMessageBox("Lỗi", "Thanh toán không thành công. Vui lòng thử lại.");
             }
         }
         catch (Exception ex)
         {
-            DialogService.ShowMessageBox("Lỗi", "Có lỗi xảy ra: " + ex.Message);
+            DialogService.ShowMessageBox("Lỗi", $"Đã có lỗi trong quá trình thanh toán: {ex.Message}");
         }
     }
 }

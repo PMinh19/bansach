@@ -10,5 +10,11 @@ namespace BanSach.Components.IService
         Task DeletePCart(Product_cart Product_cart);
         Task<Product_bill> PlaceProductBill(Product_bill productBill);
         Task<Product_bill> GetProductBillById(int productBillId);
+        Task<PaymentResult> ProcessPayment(int productBillId, string paymentMethod);
+    }
+    public class PaymentResult
+    {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
     }
 }

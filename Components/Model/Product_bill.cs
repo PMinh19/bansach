@@ -11,5 +11,6 @@
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
         public List<Product_cart> ProductCarts { get; set; }
+        public string PaymentStatus { get; set; } = "Chưa thanh toán";
     }
 }

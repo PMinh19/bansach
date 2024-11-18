@@ -83,12 +83,6 @@
 
     private async Task HandleBuyNow(Product_cart cartItem)
     {
-        if (cartItem == null || cartItem.Quantity < 1)
-        {
-            DialogService.ShowMessageBox("Lỗi", "Giỏ hàng không hợp lệ.");
-            return;
-        }
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -104,34 +98,34 @@
             DialogService.ShowMessageBox("Lỗi", "Không thể xác định người dùng.");
             return;
         }
-
         int userId = int.Parse(userIdClaim.Value);
+
+        // Log kiểm tra thông tin sản phẩm và số lượng
+        Console.WriteLine($"ProductId: {cartItem.ProductId}, Quantity: {cartItem.Quantity}, SellPrice: {cartItem.Product.SellPrice}");
 
         var productBill = new Product_bill
             {
-                FeaturePId = cartItem.ProductId,
-                Price = cartItem.Quantity * cartItem.Product.SellPrice,
+                FeaturePId = cartItem.ProductId,  // Sử dụng cartItem thay vì product_cart
+                Price = cartItem.Quantity * cartItem.Product.SellPrice,  // Sử dụng cartItem thay vì product_cart
                 Quantity = cartItem.Quantity,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
             };
 
-        try
-        {
-            var productBillResult = await CartService.PlaceProductBill(productBill);
+        // Kiểm tra xem giá trị đã được gán đúng chưa
+        Console.WriteLine($"ProductBill - FeaturePId: {productBill.FeaturePId}, Price: {productBill.Price}, Quantity: {productBill.Quantity}");
 
-            if (productBillResult != null)
-            {
-                navigationManager.NavigateTo($"/invoice/{productBillResult.ProductBillId}");
-            }
-            else
-            {
-                DialogService.ShowMessageBox("Lỗi", "Đặt hàng không thành công. Vui lòng thử lại.");
-            }
-        }
-        catch (Exception ex)
+        var productBillResult = await CartService.PlaceProductBill(productBill);
+
+        if (productBillResult != null)
         {
-            DialogService.ShowMessageBox("Lỗi", $"Không thể đặt hàng: {ex.Message}");
+            Console.WriteLine($"Hóa đơn thành công! ID: {productBillResult.ProductBillId}");
+            navigationManager.NavigateTo($"/invoice/{productBillResult.ProductBillId}");
+        }
+        else
+        {
+            DialogService.ShowMessageBox("Lỗi", "Đặt hàng không thành công. Vui lòng thử lại.");
         }
     }
+}
 }
