@@ -12,5 +12,15 @@
         public DateTime Updated { get; set; }
         public List<Product_cart> ProductCarts { get; set; }
         public string PaymentStatus { get; set; } = "Chưa thanh toán";
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending; 
+    }
+
+    // Enum trạng thái đơn hàng
+    public enum OrderStatus
+    {
+        Pending,     // Đang chờ xử lý
+        Processing,  // Đang xử lý
+        Completed,   // Đã hoàn tất
+        Cancelled    // Đã hủy
     }
 }

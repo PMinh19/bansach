@@ -92,7 +92,6 @@ namespace BanSach.Components.Services
         {
             try
             {
-                // Lấy thông tin hóa đơn
                 var productBill = await db.Product_bills.FirstOrDefaultAsync(pb => pb.ProductBillId == productBillId);
 
                 if (productBill == null)
@@ -100,24 +99,28 @@ namespace BanSach.Components.Services
                     return new PaymentResult { IsSuccess = false, Message = "Hóa đơn không tồn tại." };
                 }
 
-                // Giả sử nếu paymentMethod là "Cash", chúng ta cập nhật trạng thái thanh toán
-                if (paymentMethod == "Cash")
+                if (paymentMethod == "Tiền mặt")
                 {
-                    // Cập nhật trạng thái thanh toán của hóa đơn
-                    productBill.PaymentStatus = "Đã thanh toán bằng tiền mặt"; // Giả sử bạn có thuộc tính PaymentStatus trong Product_bill
-                    await db.SaveChangesAsync();
-                    return new PaymentResult { IsSuccess = true, Message = "Thanh toán thành công." };
+                    productBill.PaymentStatus = "Đã đặt đơn và xác nhận thanh toán bằng tiền mặt khi nhận hàng.";
+                }
+                else if (paymentMethod == "Ví điện tử")
+                {
+                    productBill.PaymentStatus = "Đã đặt đơn và chờ thanh toán qua ví điện tử.";
+                }
+                else
+                {
+                    return new PaymentResult { IsSuccess = false, Message = "Phương thức thanh toán không hợp lệ." };
                 }
 
-                // Xử lý các phương thức thanh toán khác nếu cần
-                return new PaymentResult { IsSuccess = false, Message = "Phương thức thanh toán không hợp lệ." };
+
+                await db.SaveChangesAsync();
+                return new PaymentResult { IsSuccess = true, Message = "Thanh toán thành công." };
             }
             catch (Exception ex)
             {
                 return new PaymentResult { IsSuccess = false, Message = $"Lỗi trong quá trình thanh toán: {ex.Message}" };
             }
         }
-
 
     }
 }

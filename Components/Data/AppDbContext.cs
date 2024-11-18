@@ -72,6 +72,9 @@ namespace BanSach.Components.Data
             modelBuilder.Entity<Product_bill>()
                 .Property(m => m.ProductBillId)
                 .ValueGeneratedOnAdd();
+            modelBuilder.Entity<Product_bill>()
+                 .Property(p => p.OrderStatus)
+                .HasConversion<string>();
             modelBuilder.Entity<Product_cart>()
                 .HasKey(m => new { m.UserId, m.ProductId });
             modelBuilder.Entity<Product_cart>()
