@@ -56,6 +56,13 @@ namespace BanSach.Components.Services
 
         public async Task<Product_bill> PlaceProductBill(Product_bill productBill)
         {
+            // Gán giá trị mặc định cho PaymentStatus nếu chưa có giá trị
+            if (string.IsNullOrEmpty(productBill.PaymentStatus))
+            {
+                productBill.PaymentStatus = "Chưa thanh toán";  // Hoặc giá trị mặc định nào đó mà bạn muốn
+            }
+
+            Console.WriteLine($"ProductBill - FeaturePId: {productBill.FeaturePId}, Price: {productBill.Price}, Quantity: {productBill.Quantity}");
             db.Product_bills.Add(productBill);  // Thêm hóa đơn vào cơ sở dữ liệu
             await db.SaveChangesAsync();
 
@@ -63,14 +70,15 @@ namespace BanSach.Components.Services
             var cartItems = await db.Product_carts.Where(p => p.UserId == productBill.UserId).ToListAsync();
             foreach (var item in cartItems)
             {
-                item.Updated = DateTime.Now;
-                item.IsCheckedOut = true;  // Đánh dấu giỏ hàng đã thanh toán
+                Console.WriteLine($"CartItem - ProductId: {item.ProductId}, Quantity: {item.Quantity}");
+                item.IsCheckedOut = true;
             }
 
             await db.SaveChangesAsync();
-
+            Console.WriteLine("Đã lưu hóa đơn thành công!");
             return productBill;
         }
+
 
 
         public async Task<Product_bill> GetProductBillById(int productBillId)
@@ -80,6 +88,37 @@ namespace BanSach.Components.Services
                     .FirstOrDefaultAsync(pb => pb.ProductBillId == productBillId);
         }
 
-        
+        public async Task<PaymentResult> ProcessPayment(int productBillId, string paymentMethod)
+        {
+            try
+            {
+                // Lấy thông tin hóa đơn
+                var productBill = await db.Product_bills.FirstOrDefaultAsync(pb => pb.ProductBillId == productBillId);
+
+                if (productBill == null)
+                {
+                    return new PaymentResult { IsSuccess = false, Message = "Hóa đơn không tồn tại." };
+                }
+
+                // Giả sử nếu paymentMethod là "Cash", chúng ta cập nhật trạng thái thanh toán
+                if (paymentMethod == "Cash")
+                {
+                    // Cập nhật trạng thái thanh toán của hóa đơn
+                    productBill.PaymentStatus = "Đã thanh toán bằng tiền mặt"; // Giả sử bạn có thuộc tính PaymentStatus trong Product_bill
+                    await db.SaveChangesAsync();
+                    return new PaymentResult { IsSuccess = true, Message = "Thanh toán thành công." };
+                }
+
+                // Xử lý các phương thức thanh toán khác nếu cần
+                return new PaymentResult { IsSuccess = false, Message = "Phương thức thanh toán không hợp lệ." };
+            }
+            catch (Exception ex)
+            {
+                return new PaymentResult { IsSuccess = false, Message = $"Lỗi trong quá trình thanh toán: {ex.Message}" };
+            }
+        }
+
+
     }
 }
+

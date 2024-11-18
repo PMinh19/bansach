@@ -21,11 +21,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMudServices();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IItemManagement, ItemManagement>();
 builder.Services.AddScoped<ICartService, CartService>();
-
 builder.Services.AddScoped<IAuthService, AuthService>();
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
