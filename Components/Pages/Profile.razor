@@ -11,7 +11,7 @@
         <AddressForm />
         <p></p>
 
-        <h5>Change Password</h5>
+        <h5>Đổi mật khẩu</h5>
 
         <EditForm Model="request" OnValidSubmit="ChangePassword">
             <DataAnnotationsValidator></DataAnnotationsValidator>
@@ -25,13 +25,19 @@
                 <InputText id="confirmPassword" @bind-Value="request.ConfirmPassword" class="form-control" type="password" />
                 <ValidationMessage For="@(() => request.ConfirmPassword)" />
             </div>
-            <button type="submit" class="btn btn-primary">Apply</button>
+            <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
         </EditForm>
         @message
     </Authorized>
     <NotAuthorized>
-        <h3>Whoops! You're not allowed to see this page.</h3>
-        <h5>Please <a href="login">login</a> or <a href="register">register</a> for a new account.</h5>
+        <h3>Bạn chưa được cấp quyền để xem trang này.</h3>
+        <h5>
+            Bạn cần
+            <a href="login" style="text-decoration: underline;">đăng nhập</a>
+            hoặc
+            <a href="register" style="text-decoration: underline;">đăng kí</a>
+            để xem trang này.
+        </h5>
     </NotAuthorized>
 </AuthorizeView>
 

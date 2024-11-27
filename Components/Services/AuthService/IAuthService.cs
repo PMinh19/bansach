@@ -14,5 +14,6 @@ namespace BanSach.Components.Services.AuthService
         Task<ServiceResponse<string>> Login(UserLogin request);
         Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request);
         Task<bool> IsUserAuthenticated();
+       
     }
 }

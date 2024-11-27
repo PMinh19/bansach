@@ -107,8 +107,8 @@ namespace BanSach.Components.Services.AuthService
             {
                  new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim(ClaimTypes.Name, user.Email),
-                    
-            };      
+
+            };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -143,7 +143,7 @@ namespace BanSach.Components.Services.AuthService
             return new ServiceResponse<bool> { Data = true, Message = "Password has been changed." };
         }
 
-       
+
 
 
 
@@ -178,5 +178,4 @@ namespace BanSach.Components.Services.AuthService
         }
 
     }
-
 }
