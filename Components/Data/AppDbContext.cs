@@ -9,7 +9,7 @@ namespace BanSach.Components.Data
         {
 
         }
-
+        public DbSet<QNA> QNA { get; set; }
         public DbSet<Address> Address { get; set; }
         public DbSet<Bill> Bill { get; set; }
         public DbSet<Category> Categories { get; set; }
