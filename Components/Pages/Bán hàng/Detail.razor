@@ -147,12 +147,15 @@
         // Cập nhật thông tin giỏ hàng với số lượng từ người dùng
         product_cart.ProductId = product.ProductId;
         product_cart.Quantity = quantity; // Cập nhật số lượng
-
         product_cart.Created = thoigian;
 
         // Tạo giỏ hàng mới
         await CreatProductCart();
+
+        // Hiển thị thông báo sau khi thêm sản phẩm vào giỏ
+        Snackbar.Add("Sản phẩm đã được thêm vào giỏ hàng.", Severity.Success);
     }
+
     private async Task HandleBuyNow()
     {
         // Kiểm tra số lượng trước khi tiến hành mua hàng

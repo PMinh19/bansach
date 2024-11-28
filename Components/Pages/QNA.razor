@@ -25,8 +25,13 @@
         </h5>
     }
 
+    @* Thêm nút tra từ khóa và ô nhập từ khóa *@
+
+    <MudTextField @bind-Value="SearchQuery" Placeholder="Nhập từ khóa để tìm kiếm..." Variant="Variant.Outlined" Class="mt-2" />
+    <MudButton OnClick="SearchQuestions" Color="Color.Primary" Class="mt-2">Tra từ khóa</MudButton>
+
     <MudList T="QNA">
-        @foreach (var item in Questions)
+        @foreach (var item in FilteredQuestions)
         {
             <MudListItem T="QNA">
                 <MudText>
@@ -57,7 +62,6 @@
 
                             <MudButton OnClick="() => DeleteQuestion(item.Id)" Color="Color.Error" Class="mt-2"
                                        Disabled="@(item.Email != currentUserEmail)">Xóa câu hỏi</MudButton>
-                            
                         }
                         else
                         {
@@ -81,11 +85,12 @@
 
 @code {
     private List<BanSach.Components.Model.QNA> Questions = new List<BanSach.Components.Model.QNA>();
+    private List<BanSach.Components.Model.QNA> FilteredQuestions = new List<BanSach.Components.Model.QNA>();
     private string NewAnswer;
-    private string NewQuestion;  // Biến lưu trữ câu hỏi mới
+    private string NewQuestion;
+    private string SearchQuery;
     private string currentUserEmail;
 
-    // Dùng để lưu trạng thái hiển thị câu trả lời (ẩn/hiện) theo từng câu hỏi
     private Dictionary<int, bool> isAnswerVisible = new Dictionary<int, bool>();
 
     protected override async Task OnInitializedAsync()
@@ -100,19 +105,20 @@
             currentUserEmail = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "currentUserEmail");
         }
 
-       
         if (!string.IsNullOrWhiteSpace(currentUserEmail))
         {
             await JSRuntime.InvokeVoidAsync("localStorage.setItem", "currentUserEmail", currentUserEmail);
         }
 
         Questions = await QNAService.GetQuestionsAsync();
+        FilteredQuestions = Questions;
 
         foreach (var question in Questions)
         {
-            isAnswerVisible[question.Id] = false; // Ẩn câu trả lời mặc định
+            isAnswerVisible[question.Id] = false;
         }
     }
+
     private async Task AddQuestion()
     {
         if (string.IsNullOrWhiteSpace(NewQuestion))
@@ -123,15 +129,13 @@
 
         if (string.IsNullOrWhiteSpace(currentUserEmail))
         {
-
             Snackbar.Add("Bạn cần đăng nhập để đặt câu hỏi.", Severity.Warning);
             return;
         }
 
-
         await QNAService.AddQuestionAsync(NewQuestion, currentUserEmail);
-        // Cập nhật lại danh sách câu hỏi
         Questions = await QNAService.GetQuestionsAsync();
+        FilteredQuestions = Questions;
         NewQuestion = string.Empty;
         StateHasChanged();
     }
@@ -140,17 +144,15 @@
     {
         if (string.IsNullOrWhiteSpace(currentUserEmail))
         {
-            // Người dùng chưa đăng nhập
             Snackbar.Add("Bạn cần đăng nhập để trả lời câu hỏi.", Severity.Warning);
             return;
         }
 
         if (!string.IsNullOrWhiteSpace(NewAnswer))
         {
-            // Thêm câu trả lời cho câu hỏi
             await QNAService.AddAnswerAsync(questionId, NewAnswer, currentUserEmail);
-
             Questions = await QNAService.GetQuestionsAsync();
+            FilteredQuestions = Questions;
             NewAnswer = string.Empty;
             StateHasChanged();
         }
@@ -166,8 +168,8 @@
             if (confirmDelete)
             {
                 await QNAService.DeleteQuestionAsync(questionId);
-                // Cập nhật lại danh sách câu hỏi sau khi xóa
                 Questions = await QNAService.GetQuestionsAsync();
+                FilteredQuestions = Questions;
             }
         }
         else
@@ -175,7 +177,6 @@
             Snackbar.Add("Bạn không có quyền xóa câu hỏi này.", Severity.Error);
         }
     }
-
 
     private void ToggleAnswerVisibility(int questionId)
     {
@@ -190,6 +191,16 @@
         StateHasChanged();
     }
 
-
-    
+    private void SearchQuestions()
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            FilteredQuestions = Questions; // Nếu không có từ khóa tìm kiếm, hiển thị tất cả câu hỏi
+        }
+        else
+        {
+            FilteredQuestions = Questions.Where(q => q.Question.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        StateHasChanged();
+    }
 }

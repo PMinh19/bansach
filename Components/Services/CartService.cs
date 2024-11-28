@@ -48,11 +48,18 @@ namespace BanSach.Components.Services
 
 
 
-        public async Task DeletePCart(Product_cart Product_cart)
+        public async Task DeletePCart(Product_cart productCart)
         {
-            db.Product_carts.Remove(Product_cart);
-            await db.SaveChangesAsync();
+            var cartItem = await db.Product_carts
+                                    .FirstOrDefaultAsync(pc => pc.UserId == productCart.UserId && pc.ProductId == productCart.ProductId);
+
+            if (cartItem != null)
+            {
+                db.Product_carts.Remove(cartItem); // Xóa sản phẩm khỏi giỏ hàng
+                await db.SaveChangesAsync();
+            }
         }
+
 
         public async Task<Product_bill> PlaceProductBill(Product_bill productBill)
         {
