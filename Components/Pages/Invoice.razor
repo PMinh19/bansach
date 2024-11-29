@@ -15,12 +15,45 @@
                     <div style="font-weight: bold; font-size: 1.5em;">Hóa Đơn</div>
                     <div><strong>ID Hóa Đơn:</strong> @productBill.ProductBillId</div>
                     <div><strong>Tổng Tiền:</strong> @string.Format(new CultureInfo("vi-VN"), "{0:N0}", productBill.Price) vnđ</div>
-                    <!-- Xóa tên sản phẩm -->
                     <div><strong>Số Lượng:</strong> @productBill.Quantity</div>
                     <div><strong>Ngày Tạo:</strong> @productBill.Created</div>
                     <br />
-                    <MudText Typo="Typo.h6" Class="mud-width-full">@(pay == null ? "Nothing selected." : $"Pay: {pay.Name}")</MudText>
 
+                    <!-- Địa chỉ giao hàng -->
+                    <MudText Typo="Typo.h6" Class="mud-width-full">Thông tin giao hàng</MudText>
+
+                    <!-- Tên người nhận -->
+                    <MudTextField Label="Tên người nhận" @bind-Value="receiverName" Variant="Variant.Outlined" Required="true" />
+
+                    <!-- Số điện thoại -->
+                    <MudTextField Label="Số điện thoại" @bind-Value="phoneNumber" Variant="Variant.Outlined" Required="true" />
+
+                    <!-- Thành phố -->
+                    <MudSelect T="string" Label="Chọn thành phố" @bind-Value="selectedCity" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Clearable>
+                        @foreach (var city in cities)
+                        {
+                            <MudSelectItem Value="@city.Name">@city.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <!-- Quận/Huyện -->
+                    <MudSelect T="string" Label="Chọn quận/huyện" @bind-Value="selectedDistrict" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Clearable>
+                        @if (!string.IsNullOrEmpty(selectedCity))
+                        {
+                            var selectedCityObj = cities.FirstOrDefault(c => c.Name == selectedCity);
+                            if (selectedCityObj != null)
+                            {
+                                foreach (var district in selectedCityObj.Districts)
+                                {
+                                    <MudSelectItem Value="@district">@district</MudSelectItem>
+                                }
+                            }
+                        }
+                    </MudSelect>
+
+                    <br />
+
+                    <!-- Phương thức thanh toán -->
                     <MudSelect T="Pay" @bind-Value="pay" ToStringFunc="@converter" Label="Chọn phương thức thanh toán" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Clearable>
                         <MudSelectItem Value="@(new Pay() { Name="Tiền mặt"})" />
                         <MudSelectItem Value="@(new Pay() { Name="Ví điện tử"})" />
@@ -45,15 +78,29 @@
 @code {
     [Parameter] public int productBillId { get; set; }
     private Product_bill productBill;
+
+    // Biến lưu thông tin giao hàng
+    private string receiverName; // Tên người nhận
+    private string phoneNumber;  // Số điện thoại
+    private string selectedCity; // Thành phố
+    private string selectedDistrict; // Quận/Huyện
     private Pay pay = new Pay { Name = "Tiền mặt" };  // Mặc định là Tiền mặt
 
-    // Hàm này giúp converter giá trị của Pay để hiển thị trong MudSelect
+    // Danh sách thành phố và quận/huyện
+    private List<City> cities = new List<City>
+    {
+        new City { Name = "Hà Nội", Districts = new List<string> { "Ba Đình", "Hoàn Kiếm", "Tây Hồ" } },
+        new City { Name = "Hồ Chí Minh", Districts = new List<string> { "Quận 1", "Quận 2", "Quận 3" } }
+    };
+
+    // Hàm converter cho MudSelect
     Func<Pay, string> converter = p => p?.Name;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            // Ensure productBill is initialized
             productBill = await CartService.GetProductBillById(productBillId);
         }
         catch (Exception ex)
@@ -64,10 +111,18 @@
 
     private async Task PlaceOrder()
     {
-        // Kiểm tra nếu người dùng chưa chọn phương thức thanh toán
+        // Kiểm tra thông tin giao hàng
+        if (string.IsNullOrEmpty(receiverName) || string.IsNullOrEmpty(phoneNumber) ||
+            string.IsNullOrEmpty(selectedCity) || string.IsNullOrEmpty(selectedDistrict))
+        {
+            await DialogService.ShowMessageBox("Lỗi", "Vui lòng điền đầy đủ thông tin giao hàng.");
+            return;
+        }
+
+        // Kiểm tra phương thức thanh toán
         if (pay == null || string.IsNullOrEmpty(pay.Name))
         {
-            DialogService.ShowMessageBox("Lỗi", "Vui lòng chọn phương thức thanh toán.");
+            await DialogService.ShowMessageBox("Lỗi", "Vui lòng chọn phương thức thanh toán.");
             return;
         }
 
@@ -78,28 +133,42 @@
 
             if (paymentResult.IsSuccess)
             {
-                // Xóa các sản phẩm trong giỏ hàng sau khi thanh toán thành công
-                var cartItems = await CartService.GetAllPCart();
-                var userCartItems = cartItems.Where(c => c.UserId == productBill.UserId).ToList();
-                foreach (var item in userCartItems)
-                {
-                    await CartService.DeletePCart(item); // Xóa từng sản phẩm trong giỏ hàng
-                }
+                // Lưu thông tin địa chỉ giao hàng
+                var address = new Address
+                    {
+                        UserId = productBill.UserId,  // Giả sử bạn đã có UserId từ ProductBill
+                        Name = receiverName,
+                        Phone = phoneNumber,
+                        DetailAddress = $"{selectedDistrict}, {selectedCity}",
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    };
 
-                DialogService.ShowMessageBox("Thành Công", $"Đơn hàng đã được đặt thành công với phương thức: {pay.Name}");
-                navigationManager.NavigateTo("/?message=" + Uri.EscapeDataString("Đơn hàng đã được đặt thành công với phương thức: " + pay.Name));
+                // Lưu địa chỉ vào cơ sở dữ liệu
+                await CartService.SaveAddress(address);
+
+                // Hiển thị thông báo và chuyển hướng
+                await DialogService.ShowMessageBox("Thành Công", $"Đơn hàng đã được đặt thành công.");
+                navigationManager.NavigateTo("/?message=" + Uri.EscapeDataString("Đơn hàng đã được đặt thành công."));
             }
             else
             {
-                DialogService.ShowMessageBox("Lỗi", paymentResult.Message);
+                await DialogService.ShowMessageBox("Lỗi", paymentResult.Message);
             }
         }
         catch (Exception ex)
         {
-            DialogService.ShowMessageBox("Lỗi", $"Đã xảy ra lỗi: {ex.Message}");
+            await DialogService.ShowMessageBox("Lỗi", $"Đã xảy ra lỗi: {ex.Message}");
         }
     }
 
+
+    // Lớp để lưu thông tin thành phố và quận/huyện
+    private class City
+    {
+        public string Name { get; set; }
+        public List<string> Districts { get; set; }
+    }
 
     // Lớp để lưu thông tin phương thức thanh toán
     public class Pay

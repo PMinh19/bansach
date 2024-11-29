@@ -128,7 +128,66 @@ namespace BanSach.Components.Services
                 return new PaymentResult { IsSuccess = false, Message = $"Lỗi trong quá trình thanh toán: {ex.Message}" };
             }
         }
+        public async Task<int> SaveShippingAddress(Address address)
+        {
+            db.Address.Add(address);
+            await db.SaveChangesAsync();
+            return address.AddressId; // Trả về ID của địa chỉ mới lưu
+        }
+        public async Task<ServiceResponse<int>> CreateBill(int addressId, int userId, decimal totalPrice, string note)
+        {
+            var response = new ServiceResponse<int>();
+            try
+            {
+                var bill = new Bill
+                {
+                    AddressId = addressId,
+                    TotalPrice = (int)totalPrice,
+                    Note = note,
+                    Status = 0, // Pending
+                    Created_at = DateTime.Now
+                };
 
+                db.Bill.Add(bill);
+                await db.SaveChangesAsync();
+
+                response.Data = bill.BillId;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Lỗi khi tạo hóa đơn: {ex.Message}";
+            }
+            return response;
+        }
+        public async Task<ServiceResponse<bool>> LinkBillToProductBill(int billId, List<Product_bill> productBills)
+        {
+            var response = new ServiceResponse<bool>();
+            try
+            {
+                foreach (var productBill in productBills)
+                {
+                    productBill.BillId = billId;
+                    productBill.Updated = DateTime.Now;
+                    db.Product_bills.Update(productBill);
+                }
+
+                await db.SaveChangesAsync();
+                response.Data = true;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Lỗi khi liên kết hóa đơn: {ex.Message}";
+            }
+            return response;
+        }
+        public async Task SaveAddress(Address address)
+        {
+            // Lưu thông tin vào bảng Address
+            db.Add(address);
+            await db.SaveChangesAsync();
+        }
     }
 }
 

@@ -11,7 +11,12 @@ namespace BanSach.Components.IService
         Task<Product_bill> PlaceProductBill(Product_bill productBill);
         Task<Product_bill> GetProductBillById(int productBillId);
         Task<PaymentResult> ProcessPayment(int productBillId, string paymentMethod);
-       
+        Task<int> SaveShippingAddress(Address address);
+        Task<ServiceResponse<int>> CreateBill(int addressId, int userId, decimal totalPrice, string note);
+        Task<ServiceResponse<bool>> LinkBillToProductBill(int billId, List<Product_bill> productBills);
+        Task SaveAddress(Address address);
+
+
     }
     public class PaymentResult
     {
