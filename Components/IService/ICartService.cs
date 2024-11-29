@@ -15,6 +15,7 @@ namespace BanSach.Components.IService
         Task<ServiceResponse<int>> CreateBill(int addressId, int userId, decimal totalPrice, string note);
         Task<ServiceResponse<bool>> LinkBillToProductBill(int billId, List<Product_bill> productBills);
         Task SaveAddress(Address address);
+        Task<bool> UpdateBillAsync(Bill bill);
 
 
     }

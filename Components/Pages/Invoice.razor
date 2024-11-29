@@ -147,8 +147,24 @@
                 // Lưu địa chỉ vào cơ sở dữ liệu
                 await CartService.SaveAddress(address);
 
+                // Cập nhật hóa đơn vào cơ sở dữ liệu
+                var bill = new Bill
+                    {
+                        AddressId = address.AddressId,  // Giả sử bạn đã có AddressId
+                        DeliveryId = productBill.ProductBillId,  // Đây là ID của hóa đơn
+                        PayStatus = 1, // 1 có thể là đã thanh toán
+                        TotalPrice = (int)productBill.Price, // Tổng tiền của hóa đơn
+                        Note = "Đơn hàng đã được đặt",  // Thêm ghi chú nếu cần
+                        Created_at = DateTime.Now,
+                        Updated_at = DateTime.Now,
+                        Status = 1  // Trạng thái của hóa đơn, ví dụ: 1 là đã xử lý
+                    };
+
+                // Cập nhật Bill vào cơ sở dữ liệu
+                await CartService.UpdateBillAsync(bill);
+
                 // Hiển thị thông báo và chuyển hướng
-                await DialogService.ShowMessageBox("Thành Công", $"Đơn hàng đã được đặt thành công.");
+                await DialogService.ShowMessageBox("Thành Công", "Đơn hàng đã được đặt thành công.");
                 navigationManager.NavigateTo("/?message=" + Uri.EscapeDataString("Đơn hàng đã được đặt thành công."));
             }
             else
@@ -161,6 +177,7 @@
             await DialogService.ShowMessageBox("Lỗi", $"Đã xảy ra lỗi: {ex.Message}");
         }
     }
+
 
 
     // Lớp để lưu thông tin thành phố và quận/huyện

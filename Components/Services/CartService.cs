@@ -188,6 +188,23 @@ namespace BanSach.Components.Services
             db.Add(address);
             await db.SaveChangesAsync();
         }
+        public async Task<bool> UpdateBillAsync(Bill bill)
+        {
+            try
+            {
+                // Cập nhật Bill vào cơ sở dữ liệu
+                await db.Bill.AddAsync(bill);
+                await db.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu có
+                throw new Exception("Không thể cập nhật hóa đơn: " + ex.Message);
+            }
+        }
+
     }
 }
 
