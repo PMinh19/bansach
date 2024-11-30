@@ -91,6 +91,15 @@
                                     </MudGrid>
                                     <MudGrid>
                                         <MudItem xs="12" sm="12" md="12">
+                                            <MudItem xs="12">
+                                                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                                                    <ActivatorContent>
+                                                        <MudFab Color="Color.Primary"
+                                                                StartIcon="@Icons.Material.Filled.Image"
+                                                                Label="Load picture" />
+                                                    </ActivatorContent>
+                                                </MudFileUpload>
+                                            </MudItem>
                                             @if (!string.IsNullOrEmpty(product.Img))
                                             {
                                                 <MudItem xs="12">
@@ -148,7 +157,7 @@
 @code {
 #nullable enable
     private void SetDragClass() => _dragClass = $"{DefaultDragClass} mud-border-primary";
-
+    private string imageDirectory;
     private void ClearDragClass() => _dragClass = DefaultDragClass;
     public int categoryId;
     public string? categoryName;
@@ -181,7 +190,27 @@
         ClearDragClass();
         StateHasChanged();
     }
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        // Kiểm tra nếu thư mục 'images' không tồn tại thì tạo mới
+        if (!Directory.Exists(imageDirectory))
+        {
+            Directory.CreateDirectory(imageDirectory);
+        }
 
+        // Tạo tên file duy nhất
+        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
+        string filePath = Path.Combine(imageDirectory, fileName);
+
+        // Lưu file vào thư mục
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.OpenReadStream().CopyToAsync(stream);
+        }
+
+        // Cập nhật đường dẫn file vào database hoặc object
+        product.Img = "/images/" + fileName;
+    }
     private Task OpenFilePickerAsync() => _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
 
     private async void OnInputFileChanged(InputFileChangeEventArgs e)
@@ -294,7 +323,7 @@
             product.Updated = DateTime.Now;
             await ItemManagement.EditItem(product);
             success = true;
-            navigationManager.NavigateTo("/Ql/Product");
+           
         }
         catch (Exception ex)
         {
