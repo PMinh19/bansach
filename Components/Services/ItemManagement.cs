@@ -41,7 +41,7 @@ namespace BanSach.Components.Services
             var product = await db.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
             if (product == null)
             {
-                return null; 
+                return null;
             }
 
             return product;
@@ -65,7 +65,7 @@ namespace BanSach.Components.Services
         {
             db.Categories.Add(category);
             await db.SaveChangesAsync();
-            return category; 
+            return category;
         }
 
         public async Task DeleteCategory(Category category)
@@ -78,6 +78,36 @@ namespace BanSach.Components.Services
         {
             db.Categories.Update(category);
             await db.SaveChangesAsync();
+        }
+        public async Task<List<Img>> GetAllImg()
+        {
+            return await db.Imgs.ToListAsync();
+        }
+        public async Task<Img> CreateImg(Img img)
+        {
+            db.Imgs.Add(img);
+            await db.SaveChangesAsync();
+            return img;
+        }
+        public async Task EditImg(Img img)
+        {
+            db.Imgs.Update(img);
+            await db.SaveChangesAsync();
+        }
+        public async Task<Img?> GetLastImgAsync()
+        {
+            // Lấy sản phẩm có ImgId lớn nhất (giả sử đây là sản phẩm được thêm cuối cùng)
+            var img = await db.Imgs
+                              .OrderByDescending(i => i.ImgId) // Sắp xếp giảm dần theo ImgId
+                              .FirstOrDefaultAsync(); // Lấy ảnh đầu tiên (cuối cùng trong bảng)
+
+            // Kiểm tra nếu không có ảnh nào
+            if (img == null)
+            {
+                return null;
+            }
+
+            return img;
         }
 
     }

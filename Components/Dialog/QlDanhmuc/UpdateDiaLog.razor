@@ -6,17 +6,32 @@
 @rendermode InteractiveServer
 <MudDialog style="width:500px">
     <TitleContent>
-        <MudText Typo="Typo.h6" style="text-align:center">          
-           -- Update Category! --
+        <MudText Typo="Typo.h5">
+            Sửa danh mục
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField Label="Id"
-                      @bind-Value="category.CategoryId" For="@(() => category.CategoryId)" ReadOnly />
-        <MudTextField Label="Tên"
-                      @bind-Value="category.CategoryName" For="@(() => category.CategoryName)" />
-        <MudTextField Label="Ảnh" Class="mt-3"
-                      @bind-Value="category.Img" For="@(() => category.Img)" />        
+        <MudTextField @bind-Value="category.CategoryName" Label="Outlined" Variant="Variant.Outlined"></MudTextField>
+
+        <MudGrid>
+            <MudItem xs="12">
+                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                    <ActivatorContent>
+                        <MudFab Color="Color.Primary"
+                                StartIcon="@Icons.Material.Filled.Image"
+                                Label="Load picture" />
+                    </ActivatorContent>
+                </MudFileUpload>
+            </MudItem>
+
+            @if (!string.IsNullOrEmpty(category.Img))
+            {
+                <MudItem xs="12">
+                    <MudText Typo="@Typo.h6">Xem trước ảnh:</MudText>
+                    <img src="@category.Img" alt="Preview" width="180" Height="200" Class="rounded-lg" />
+                </MudItem>
+            }
+        </MudGrid>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
@@ -27,10 +42,33 @@
     [Parameter]
     [CascadingParameter]
     public MudDialogInstance? MudDialog { get; set; }
-
+    private string? imageDirectory;
     [Parameter]
     public Category category { get; set; } = new Category();
+    private IList<IBrowserFile> _files = new List<IBrowserFile>();
 
+    // Phương thức tải lên ảnh
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        // Kiểm tra nếu thư mục 'images' không tồn tại thì tạo mới
+        if (!Directory.Exists(imageDirectory))
+        {
+            Directory.CreateDirectory(imageDirectory);
+        }
+
+        // Tạo tên file duy nhất
+        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
+        string filePath = Path.Combine(imageDirectory, fileName);
+
+        // Lưu file vào thư mục
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.OpenReadStream().CopyToAsync(stream);
+        }
+
+        // Cập nhật đường dẫn file vào database hoặc object
+        category.Img = "/images/" + fileName;
+    }
     private void Cancel() => MudDialog!.Cancel();
 
     private void updateCategory()

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+
 public class CustomAuthStateProvider : AuthenticationStateProvider
 {
     private readonly ILocalStorageService localStorageService;
@@ -24,33 +25,47 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
 
+        // Lấy token từ LocalStorage
         string authToken = await localStorageService.GetItemAsStringAsync("authToken");
         var identity = new ClaimsIdentity();
         http.DefaultRequestHeaders.Authorization = null;
 
+        // Nếu token tồn tại, thêm thông tin xác thực vào headers HTTP
         if (!string.IsNullOrEmpty(authToken))
         {
-            identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
-            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken.Replace("\"", ""));
+            try
+            {
+                identity = new ClaimsIdentity(ParseClaimsFromJwt(authToken), "jwt");
+                http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken.Replace("\"", ""));
+            }
+            catch (Exception)
+            {
+                // Xử lý lỗi giải mã token nếu có
+                identity = new ClaimsIdentity();
+            }
         }
 
         var user = new ClaimsPrincipal(identity);
         return new AuthenticationState(user);
     }
 
+    // Đánh dấu kết thúc quá trình prerendering
     public void NotifyPrerenderCompleted()
     {
         isPrerendering = false;
     }
 
+    // Khởi tạo lại trạng thái xác thực khi đã sẵn sàng
     public void InitializeAuthenticationStateAsync()
     {
         isInitialized = true;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
+    // Hàm giải mã JWT
     private byte[] ParseBase64WithoutPadding(string base64)
     {
+        // Thêm padding vào Base64 nếu cần
         switch (base64.Length % 4)
         {
             case 2: base64 += "=="; break;
@@ -59,6 +74,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
         return Convert.FromBase64String(base64);
     }
 
+    // Phân tích claims từ JWT token
     private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
     {
         var payload = jwt.Split('.')[1];

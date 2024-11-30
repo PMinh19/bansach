@@ -28,18 +28,19 @@
         <MudTd DataLabel="Tên danh mục">
             <span>@context.CategoryName</span>
         </MudTd>
-        <MudTd DataLabel="Ngày tạo">
+        <MudTd DataLabel="Ngày tạo" >
             <span>@context.Created_at</span>
         </MudTd>
         <MudTd DataLabel="Ảnh">
             <MudImage ObjectFit="ObjectFit.Cover" Width="70" Height="55" Src="@context.Img" Class="rounded-lg" />
         </MudTd>
          <MudTd DataLabel="Sửa">
-            <MudButton style="padding: 10px;background:blue; color:white" Variant="Variant.Text" OnClick="@((e) => UpdateAsync(context))">Sửa</MudButton>
+            <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit" OnClick="@((e) => UpdateAsync(context))"></MudButton>
         </MudTd> 
 
         <MudTd DataLabel="Xóa">
-            <MudButton style="padding: 10px;background: red; color:white" Variant="Variant.Filled" OnClick="@((e) => DeleteAsync(context))">Xóa</MudButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color=Color.Error Size="Size.Small" OnClick="@((e) => DeleteAsync(context))" />
+            
         </MudTd>
 
     </RowTemplate>

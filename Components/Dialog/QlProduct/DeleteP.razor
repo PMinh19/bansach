@@ -12,11 +12,11 @@
         Thông báo
     </TitleContent>
     <DialogContent>
-        Bạn có muốn xóa mặt hàng này không?
+        Bạn có muốn xóa sản phẩm này không?
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Primary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton style="color:red" OnClick="DeleteCategory">Ok</MudButton>
+        <MudButton style="color:red" OnClick="DeleteProduct">Ok</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -24,14 +24,16 @@
     private MudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
-    public Category category { get; set; } = new Category();
+    public Product product { get; set; } = new Product();
 
     private void Cancel() => MudDialog!.Cancel();
 
-    private void DeleteCategory()
+    private void DeleteProduct()
     {
 
-        MudDialog!.Close(DialogResult.Ok(category));
+        MudDialog!.Close(DialogResult.Ok(product));
+        navigationManager.NavigateTo("/Ql/product");
     }
 }
+
 

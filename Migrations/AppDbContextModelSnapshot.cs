@@ -53,7 +53,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("AddressId");
 
-                    b.ToTable("Address");
+                    b.ToTable("Address", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Bill", b =>
@@ -90,7 +90,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("BillId");
 
-                    b.ToTable("Bill");
+                    b.ToTable("Bill", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Category", b =>
@@ -115,7 +115,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Delivery", b =>
@@ -152,7 +152,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("DeliveryId");
 
-                    b.ToTable("Deliveries");
+                    b.ToTable("Deliveries", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Feature_Products", b =>
@@ -189,7 +189,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("FeaturePId");
 
-                    b.ToTable("FeatureProducts");
+                    b.ToTable("FeatureProducts", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Img", b =>
@@ -214,7 +214,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("ImgId");
 
-                    b.ToTable("Imgs");
+                    b.ToTable("Imgs", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Personal_access_token", b =>
@@ -254,7 +254,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("PersonalId");
 
-                    b.ToTable("Personal_access_tokens");
+                    b.ToTable("Personal_access_tokens", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Product", b =>
@@ -306,7 +306,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Product_bill", b =>
@@ -348,7 +348,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("ProductBillId");
 
-                    b.ToTable("Product_bills");
+                    b.ToTable("Product_bills", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Product_cart", b =>
@@ -380,7 +380,7 @@ namespace BanSach.Migrations
 
                     b.HasIndex("Product_billProductBillId");
 
-                    b.ToTable("Product_carts");
+                    b.ToTable("Product_carts", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.QNA", b =>
@@ -412,7 +412,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QNA");
+                    b.ToTable("QNA", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Role", b =>
@@ -428,7 +428,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Sell", b =>
@@ -453,7 +453,7 @@ namespace BanSach.Migrations
 
                     b.HasKey("SellId");
 
-                    b.ToTable("Sells");
+                    b.ToTable("Sells", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.User", b =>
@@ -503,7 +503,7 @@ namespace BanSach.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("BanSach.Components.Model.Product_cart", b =>

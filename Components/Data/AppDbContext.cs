@@ -75,13 +75,16 @@ namespace BanSach.Components.Data
             modelBuilder.Entity<Product_bill>()
                  .Property(p => p.OrderStatus)
                 .HasConversion<string>();
+            modelBuilder.Entity<Product_bill>()
+    .Property(p => p.Price)
+    .HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Product_cart>()
-                .HasKey(m => new { m.UserId, m.ProductId });
+           .HasKey(m => new { m.UserId, m.ProductId });  // Sử dụng khóa chính kết hợp UserId và ProductId
             modelBuilder.Entity<Product_cart>()
-               .HasOne(pc => pc.Product)   // Mối quan hệ với Product
-               .WithMany()                  // Một sản phẩm có thể có nhiều giỏ hàng
-               .HasForeignKey(pc => pc.ProductId)  // Khóa ngoại tham chiếu đến bảng Products
-               .OnDelete(DeleteBehavior.Cascade);  // Xóa giỏ hàng nếu sản phẩm bị xóa
+                .HasOne(pc => pc.Product)   // Mối quan hệ với Product
+                .WithMany()                  // Một sản phẩm có thể có nhiều giỏ hàng
+                .HasForeignKey(pc => pc.ProductId)  // Khóa ngoại tham chiếu đến bảng Products
+                .OnDelete(DeleteBehavior.Cascade);  // Xóa giỏ hàng nếu sản phẩm bị xóa
 
             modelBuilder.Entity<Product>()
                 .HasKey(m => m.ProductId);

@@ -14,5 +14,9 @@ namespace BanSach.Components.IService
         Task<Category> CreateCategory(Category category);
         Task DeleteCategory(Category category);
         Task EditCategory(Category category);
+        Task<List<Img>> GetAllImg();
+        Task<Img> CreateImg(Img img);
+        Task EditImg(Img img);
+        Task<Img?> GetLastImgAsync();
     }
 }
