@@ -157,7 +157,7 @@
 @code {
 #nullable enable
     private void SetDragClass() => _dragClass = $"{DefaultDragClass} mud-border-primary";
-    private string imageDirectory;
+    private string? imageDirectory;
     private void ClearDragClass() => _dragClass = DefaultDragClass;
     public int categoryId;
     public string? categoryName;
@@ -198,6 +198,16 @@
             Directory.CreateDirectory(imageDirectory);
         }
 
+        // Nếu ảnh hiện tại đã tồn tại, xóa nó
+        if (!string.IsNullOrEmpty(product.Img))
+        {
+            string existingFilePath = Path.Combine(imageDirectory, Path.GetFileName(product.Img));
+            if (File.Exists(existingFilePath))
+            {
+                File.Delete(existingFilePath);
+            }
+        }
+
         // Tạo tên file duy nhất
         string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.Name);
         string filePath = Path.Combine(imageDirectory, fileName);
@@ -211,6 +221,7 @@
         // Cập nhật đường dẫn file vào database hoặc object
         product.Img = "/images/" + fileName;
     }
+
     private Task OpenFilePickerAsync() => _fileUpload?.OpenFilePickerAsync() ?? Task.CompletedTask;
 
     private async void OnInputFileChanged(InputFileChangeEventArgs e)
