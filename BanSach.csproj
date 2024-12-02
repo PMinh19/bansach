@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Forms" Version="8.0.10" />

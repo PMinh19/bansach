@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using BanSach.Components.Services.QNAService;
-using Microsoft.AspNetCore.Authentication.Google;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,16 +64,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Chỉ sử dụng với HTTPS
 });
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-}).AddCookie().AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-{
-    options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
-    options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
-});
+
 var app = builder.Build();
 
 
