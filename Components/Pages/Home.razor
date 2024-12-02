@@ -45,7 +45,7 @@
                         <MudGrid Mode="GridMode.Flex" Class="anh" Style="display:flex;">
                             @foreach (var item in products)
                             {
-                                <MudItem sm="4" md="2" xs="6">
+                                <MudItem sm="4" md="2" xs="6" Style="margin: 10px;">
                                     <Button Class="button" @onclick="() => Detail(item.ProductId)" Style="width: 100%;">
                                         <div><img ObjectFit="ObjectFit.Cover" Src="@item.Img" Height="200" Class="rounded-lg" /></div>
                                         <div style="width: 100%; overflow: hidden; white-space: nowrap;">
@@ -56,6 +56,7 @@
                                 </MudItem>
                             }
                         </MudGrid>
+
                     }
                     else
                     {
@@ -78,17 +79,17 @@
 </MudContainer>
 <style>
     .button {
-    margin: 10px 0 0 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: Arial;
-    font-weight: bold;
+        margin: 10px 0 0 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: Arial;
+        font-weight: bold;
     }
 
-    .button:hover {
-    transform: scale(1.05);
-    }
+        .button:hover {
+            transform: scale(1.05);
+        }
 </style>
 @code {
     private List<Product> products = new List<Product>();
@@ -99,7 +100,7 @@
     private List<Category> categories = new List<Category>();
     private async Task<List<Product>> getAllSach() => await ItemManagement.GetAllItem();
     private string searchString1 = "";
-   
+
     protected override async Task OnInitializedAsync()
     {
         // Khởi tạo danh sách nếu các dịch vụ trả về null

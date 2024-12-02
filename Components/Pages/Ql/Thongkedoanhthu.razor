@@ -16,7 +16,9 @@
     <div class="d-flex justify-space-between align-center pa-8">
         <MudPaper Class="pa-16 ma-2" Elevation="1">Người dùng: @users.Count</MudPaper>
         <MudPaper Class="pa-16 ma-2" Elevation="3">Đơn hàng: @bills.Count</MudPaper>
-        <MudPaper Class="pa-16 ma-2" Elevation="3">Doanh số: @bills.Count</MudPaper> 
+        <MudPaper Class="pa-16 ma-2" Elevation="3">Doanh số: @bills.Count</MudPaper>
+        <MudPaper Class="pa-16 ma-2" Elevation="3">Doanh thu:</MudPaper>
+    </div>
     </div>
 
     <div Class="py-2 px-2 mt-2">
@@ -41,7 +43,7 @@
                 <MudButton Variant="Variant.Filled" FullWidth  Class="px-4" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary">Tìm kiếm</MudButton>
             </MudItem>
         </MudGrid>
-      @*   <MudMenu Class="d-block" LockScroll="true" PositionAtCursor="true" ActivationEvent="MouseEvent.RightClick">
+         <MudMenu Class="d-block" LockScroll="true" PositionAtCursor="true" ActivationEvent="MouseEvent.RightClick">
             <ActivatorContent>
                 <MudTable Dense="true" Class="mt-3" Bordered Height="465px"
                           ReadOnly="false" HeaderClass="pa-1" Items="dt.Select()"
@@ -49,10 +51,10 @@
                           @bind-SelectedItem="@selectedItem" HorizontalScrollbar="true">
                    
                     <HeaderContent>
-                        <MudTh Style=" text-align:center;min-width: 50vw; position: sticky; left: 0; z-index: 1; background-color: white;"> Đối tượng </MudTh>
-                        <MudTh Style="text-align:center; white-space:nowrap;"> Tổng tiền </MudTh>
-                        <MudTh Style="text-align:center; white-space:nowrap;"> Trạng thái </MudTh>
-                        <MudTh Style="text-align:center; white-space:nowrap;"> Ngày </MudTh>
+                        <MudTh Style=" text-align:center"> Đối tượng </MudTh>
+                        <MudTh Style="text-align:center"> Tổng tiền </MudTh>
+                        <MudTh Style="text-align:center"> Trạng thái </MudTh>
+                        <MudTh Style="text-align:center"> Ngày </MudTh>
                        
                     </HeaderContent>
                     <RowTemplate>
@@ -67,9 +69,9 @@
                 </MudTable>
 
             </ActivatorContent>
-        </MudMenu> *@
+        </MudMenu> 
     </div>
-</div>
+
 @code {
     private Role role = new();
     private List<Bill> bills = new();
